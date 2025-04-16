@@ -1,6 +1,6 @@
 from tensorflow import keras
 import tensorflow as tf
-from retrain_model import retrain_model
+from flood.retrain_model import retrain_model
 
 def init():
     # Recreate the model architecture

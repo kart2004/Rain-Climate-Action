@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Flood Predictor</title>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/bootstrap.min.css') }}">
+
+    <!-- FontAwesome CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/font-awesome.min.css') }}">
+
+    <!-- ElegantFonts CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/elegant-fonts.css') }}">
+
+    <!-- themify-icons CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/themify-icons.css') }}">
+
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/swiper.min.css') }}">
+
+    <!-- Styles -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/style.css') }}">
+
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+    <div class="swiper-container">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide hero-content-wrap">
+                <!-- Dynamically change the image and message based on severity -->
+                <img src="{{ url_for('static', filename='images/' + severity + '.jpg') }}" alt="">
+
+                <div class="hero-content-overlay position-absolute w-100 h-100">
+                    <div class="container h-100">
+                        <div class="row h-100">
+                            <div class="col-12 col-lg-8 d-flex flex-column justify-content-center align-items-start">
+                                <header class="entry-header">
+                                    <h1>
+                                        {% if severity == '0' %}
+                                            Hooray, no chances of floods here!
+                                        {% elif severity == '1' %}
+                                            Get your weather boots out!
+                                        {% elif severity == '2' %}
+                                            Looks like you are going to be working from home!
+                                        {% elif severity == '3' %}
+                                            Beware, heavy floods incoming!
+                                        {% elif severity == '4' %}
+                                            Brace yourself! Severe floods incoming!
+                                        {% elif severity == '5' %}
+                                            Act fast! You are in grave danger!
+                                        {% endif %}
+                                    </h1>
+                                </header>
+
+                                <div class="entry-content mt-4">
+                                    <p>
+                                        {% if severity == '0' %}
+                                            Based on your location and the given date, there are negligible chances of a flood occurring! Sit back, relax, and enjoy your day!
+                                        {% elif severity == '1' %}
+                                            Based on your location and the given date, there are mild chances of a flood occurring! Be careful while going outdoors!
+                                        {% elif severity == '2' %}
+                                            Based on your location and the given date, there are high chances of a flood occurring! Going outdoors is not advisable!
+                                        {% elif severity == '3' %}
+                                            Based on your location and the given date, there are very high chances of a flood occurring! Prepare for heavy water logging!
+                                        {% elif severity == '4' %}
+                                            Based on your location and the given date, there are extremely high chances of a flood occurring! Take quick action and protect yourself!
+                                        {% elif severity == '5' %}
+                                            Based on your location and the given date, there are incredibly high chances of a severe flood occurring! Prepare yourself for a strong wave of destruction!
+                                        {% endif %}
+                                    </p>
+                                </div>
+
+                                <footer class="entry-footer d-flex flex-wrap align-items-center mt-5">
+                                    <a href="{{ url_for('index') }}" class="btn blue-border mr-2">Predict Again</a>
+                                </footer>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- The rest of the components remain the same -->
+    <div class="home-page-welcome" id="charity">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-lg-6 order-2 order-lg-1">
+                    <div class="welcome-content">
+                        <header class="entry-header">
+                            <h2 class="entry-title">Floods in India</h2>
+                        </header>
+
+                        <div class="entry-content flood-desc mt-5">
+                            <p>Floods cause extremely large numbers of fatalities in every country, but due to India's extremely high population density and often under-enforced development standards, large amount of damages and casualties which could otherwise be avoided, are allowed to happen. India witnesses flood due to excessive rain which then results in overflowing of rivers, lakes and dams, which adds to the large amounts of damage to people's lives and property. In the past, India has witnessed many of the largest, most catastrophic floods, causing irreparable damage to people's livelihood, property, and crucial infrastructure.</p>
+                        </div>
+
+                        <div class="entry-button mt-3">
+                            <a href="https://earthobservatory.nasa.gov/images/51408/flooding-in-india" class="btn blue-border mr-2" target="_blank">Read More</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-6 mt-1 order-1 order-lg-2">
+                    <img src="{{ url_for('static', filename='images/floodimage1.jpg') }}" alt="welcome">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="home-page-icon-boxes" id="volunteer">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-md-6 col-lg-4 mt-4 mt-lg-0">
+                    <div class="icon-box">
+                        <div class="d-flex justify-content-center number">
+                            <p><strong>1</strong></p>
+                            <!-- <img src = "{{ url_for('static', filename = 'images/one-grey.jpeg') }}" alt="">
+                            <img src = "{{ url_for('static', filename = 'images/one-white.jpeg') }}" alt=""> -->
+                        </div>
+
+                        <header class="entry-header">
+                            <h3 class="entry-title">Before a Flood</h3>
+                        </header>
+
+                        <div class="entry-content">
+                            <p>Avoid building in floodplain, construct barriers to stop floodwater from entering your home, seal walls in basements with waterproofing compounds to avoid seepage and a flood is likely in your area, listen to the radio or television for info. Know the difference between a flood watch and a flood warning. A watch means flooding is possible as warning means flooding is occurring or will occur.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4 mt-4 mt-lg-0">
+                    <div class="icon-box">
+                        <div class="d-flex justify-content-center number">
+                            <p><strong>2</strong></p>
+                            <!-- <img src = "{{ url_for('static', filename = 'images/one-grey.jpeg') }}" alt="">
+                            <img src = "{{ url_for('static', filename = 'images/one-white.jpeg') }}" alt=""> -->
+                        </div>
+
+                        <header class="entry-header">
+                            <h3 class="entry-title">During a Flood</h3>
+                        </header>
+
+                        <div class="entry-content">
+                            <p>Do not walk through moving water. As little as 6 inches (15 centimeters) of moving water can make you fall and if you have to walk in water, wherever possible, walk where the water is not moving. Use a stick to check the firmness of the ground in front of you. Do not drive into flooded areas. If floodwaters rise around your car, abandon the car and move to higher ground if you can do so safely.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4 mt-4 mt-lg-0">
+                    <div class="icon-box">
+                        <div class="d-flex justify-content-center number">
+                            <p><strong>3</strong></p>
+                            <!-- <img src = "{{ url_for('static', filename = 'images/one-grey.jpeg') }}" alt="">
+                            <img src = "{{ url_for('static', filename = 'images/one-white.jpeg') }}" alt=""> -->
+                        </div>
+
+                        <header class="entry-header">
+                            <h3 class="entry-title">After a Flood</h3>
+                        </header>
+
+                        <div class="entry-content">
+                            <p>Be aware of areas where floodwaters have receded. Roads may have weakened and could collapse under the weight of a car. Stay away from downed power lines, and report them to the power company. Stay out of any building if it is surrounded by floodwaters. Damaged sewage systems are serious health hazards. Clean and disinfect everything that got wet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- .row -->
+        </div><!-- .container -->
+    </div><!-- .home-page-icon-boxes -->
+
+    <div class="home-page-events bghue makeblack" id="events">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-lg-10">
+                    <div class="upcoming-events">
+                        <div class="section-heading">
+                            <h2 class="entry-title">Flood Management</h2>
+                        </div><!-- .section-heading -->
+
+                        <div class="event-wrap d-flex flex-wrap justify-content-between">
+                            <figure class="m-0">
+                                <img src = "{{ url_for('static', filename = 'images/precautions.jpeg') }}" alt="">
+                            </figure>
+
+                            <div class="event-content-wrap">
+                                <header class="entry-header d-flex flex-wrap align-items-center">
+                                    <h3 class="entry-title w-100 m-0">Precautions</h3>
+                                </header><!-- .entry-header -->
+
+                                <div class="entry-content">
+                                    <p class="m-0">Before building, check the area for signs or history of flooding and find out how many feet above flood level you need to build your house. Do not throw garbage into drains and rivers. Put sandbags by exposed openings. Turn off gas and electricity. Unplug electrical appliances. Put dangerous, flammable or explosive liquids in a safe place and close containers securely. Seal important personal, legal and business documents in watertight containers and place above flood height. Take furniture to upper floors or raise on a sturdy table. Secure vehicles.</p>
+                                </div><!-- .entry-content -->
+
+                            </div><!-- .event-content-wrap -->
+                        </div><!-- .event-wrap -->
+
+                        <div class="event-wrap d-flex flex-wrap justify-content-between">
+                            <figure class="m-0">
+                                <img src = "{{ url_for('static', filename = 'images/safety.jpeg') }}" alt="">
+                            </figure>
+
+                            <div class="event-content-wrap">
+                                <header class="entry-header d-flex flex-wrap align-items-center">
+                                    <h3 class="entry-title w-100 m-0">Safety Measures</h3>
+                                </header><!-- .entry-header -->
+
+                                <div class="entry-content">
+                                    <p class="m-0">Stay away from power lines and electrical wires: The number two flood killer after drowning is electrocution. Electric current can travel through water. Report downed power lines to the electricity provider or the county Emergency Management Office. Install a flood-detection device in your basement that sounds an alarm or calls your phone if it senses water.</p>
+                                </div><!-- .entry-content -->
+
+                            </div><!-- .event-content-wrap -->
+                        </div><!-- .event-wrap -->
+
+                        <div class="event-wrap d-flex flex-wrap justify-content-between">
+                            <figure class="m-0">
+                                <img src = "{{ url_for('static', filename = 'images/helpline.jpeg') }}" alt="">
+                            </figure>
+
+                            <div class="event-content-wrap">
+                                <header class="entry-header d-flex flex-wrap align-items-center">
+                                    <h3 class="entry-title w-100 m-0">Helpline</h3>
+                                </header><!-- .entry-header -->
+
+                                <div class="entry-content">
+                                    <p class="m-0">In case you are stuck in a flood, contact the Indian Disaster Management at 108 for immediate help. You can also visit https://ndma.gov.in/en/ for information and help. Standard homeowners insurance generally doesn't cover damage caused by a flood. So it’s a good idea to consider protecting yourself with a flood insurance policy. Learn more about homeowner insurance coverage of water damage, then ask your insurance agent about flood insurance, and whether it is available in your area.</p>
+                                </div><!-- .entry-content -->
+                            </div><!-- .event-content-wrap -->
+                        </div><!-- .event-wrap -->
+                    </div><!-- .upcoming-events -->
+                </div><!-- .col -->
+            </div><!-- .row -->
+        </div><!-- .container -->
+    </div><!-- .home-page-events -->
+
+    <div class="about-stats" id="stats">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="circular-progress-bar">
+                        <div class="circle" id="loader_1_0">
+                            <strong class="d-flex justify-content-center"></strong>
+                        </div>
+
+                        <h3 class="entry-title">Severity</h3>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="circular-progress-bar">
+                        <div class="circle" id="loader_2_0">
+                            <strong class="d-flex justify-content-center"></strong>
+                        </div>
+
+                        <h3 class="entry-title">Repairable Damage</h3>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="circular-progress-bar">
+                        <div class="circle" id="loader_3_0">
+                            <strong class="d-flex justify-content-center"></strong>
+                        </div>
+
+                        <h3 class="entry-title">Level of Water</h3>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="circular-progress-bar">
+                        <div class="circle" id="loader_4">
+                            <strong class="d-flex justify-content-center"></strong>
+                        </div>
+
+                        <h3 class="entry-title">Prediction Accuracy</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="home-page-limestone" id="causes">
+        <div class="container">
+            <div class="row align-items-end">
+                <div class="coL-12 col-lg-6">
+                    <div class="section-heading">
+                        <h2 class="entry-title">"Rivers, mountains, forests, and all forms of life are not just resources to be exploited but a sacred trust to be preserved."</h2>
+
+                        <p class="mt-5">- Sunderlal Bahuguna</p>
+                    </div><!-- .section-heading -->
+                </div><!-- .col -->
+
+                <div class="col-12 col-lg-6">
+                    <div class="milestones d-flex flex-wrap ">
+                        <div class="col-12 col-sm-6 mt-5 mt-lg-0">
+                            <div class="counter-box">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <img src = "{{ url_for('static', filename = 'images/precipitation.jpeg') }}" alt="">
+                                </div>
+
+                                <div class="d-flex justify-content-center align-items-baseline customs">
+                                    <div><strong>{{ precipitation }} mm</strong></div>
+                                </div>
+
+                                <h3 class="entry-title">Precipitation</h3><!-- entry-title -->
+                            </div><!-- counter-box -->
+                        </div><!-- .col -->
+
+                        <div class="col-12 col-sm-6 mt-5 mt-lg-0">
+                            <div class="counter-box">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <img src = "{{ url_for('static', filename = 'images/terrain.jpeg') }}" alt="">
+                                </div>
+                                <div class="d-flex justify-content-center align-items-baseline customs">
+                                    <div><strong>{{ terrain }}</strong></div>
+                                </div>
+
+                                <h3 class="entry-title">Terrain</h3><!-- entry-title -->
+                            </div><!-- counter-box -->
+                        </div><!-- .col -->
+
+                        
+                    </div><!-- .milestones -->
+                </div><!-- .col -->
+            </div><!-- .row -->
+        </div><!-- .container -->
+    </div><!-- .our-causes -->
+
+    <script type='text/javascript' src = "{{ url_for('static', filename = 'js/jquery.js') }}"></script>
+    <script type='text/javascript' src = "{{ url_for('static', filename = 'js/jquery.collapsible.min.js') }}"></script>
+    <script type='text/javascript' src = "{{ url_for('static', filename = 'js/swiper.min.js') }}"></script>
+    <script type='text/javascript' src = "{{ url_for('static', filename = 'js/jquery.countdown.js') }}"></script>
+    <script type='text/javascript' src = "{{ url_for('static', filename = 'js/circle-progress.min.js') }}"></script>
+    <script type='text/javascript' src = "{{ url_for('static', filename = 'js/jquery.countTo.min.js') }}"></script>
+    <script type='text/javascript' src = "{{ url_for('static', filename = 'js/jquery.barfiller.js') }}"></script>
+    <script type='text/javascript' src = "{{ url_for('static', filename = 'js/custom.js') }}"></script>
+
+</body>
+</html>

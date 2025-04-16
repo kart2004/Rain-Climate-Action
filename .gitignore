@@ -1,0 +1,41 @@
+# Python bytecode files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Development tools
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment variables
+.env
+.env.local
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Model files (if you want to exclude them)
+# model/*.h5
+
+# Logs
+logs/
+*.log
+
+# Local data files (optional, you might want to include them)
+# data/
+
+# System files
+.DS_Store
+Thumbs.db

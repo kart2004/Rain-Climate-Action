@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Drought Prediction Result</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+</head>
+<body>
+    <div class="container mt-5 text-center">
+        <h1 class="mb-4">
+            {% if severity == '0' %}
+                No Drought Detected
+            {% elif severity == '1' %}
+                Slight Dry Spell Expected
+            {% elif severity == '2' %}
+                Mild Drought Warning
+            {% elif severity == '3' %}
+                Moderate Drought Alert
+            {% elif severity == '4' %}
+                Severe Drought Conditions
+            {% elif severity == '5' %}
+                Extreme Drought Emergency
+            {% endif %}
+        </h1>
+
+        <p>
+            {% if severity == '0' %}
+                Conditions appear normal for your selected region and time period.
+            {% elif severity == '1' %}
+                Keep an eye on irrigation and rainfall patterns; minor dry spells might occur.
+            {% elif severity == '2' %}
+                Water stress may affect crops and availability slightly — consider precautionary steps.
+            {% elif severity == '3' %}
+                Drought conditions likely — ensure water conservation and preparedness.
+            {% elif severity == '4' %}
+                Severe drought is expected — take critical steps to manage resources.
+            {% elif severity == '5' %}
+                Extreme drought threat — initiate emergency water and crop management strategies.
+            {% endif %}
+        </p>
+
+        {% if prediction %}
+            <h3 class="mt-4">Prediction Result: {{ prediction }}</h3>
+        {% endif %}
+
+        <a href="{{ url_for('drought') }}" class="btn btn-warning mt-4">Predict Again</a>
+    </div>
+</body>
+</html>

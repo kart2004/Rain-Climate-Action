@@ -176,7 +176,7 @@ def predict():
         
         try:
             # Predict severity
-            severity = predict_flood_severity(state, precipitation)
+            severity = predict_flood_severity(state, precipitation, terrain)
             
             return render_template(
                 'flood_predict.html', 

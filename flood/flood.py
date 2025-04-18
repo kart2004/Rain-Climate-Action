@@ -5,13 +5,23 @@ from datetime import datetime
 import os
 import sys
 
-# Import config and model loader
+# Import config and model loader using relative imports
 from flood.config import STATE_MAPPING, MONTH_MAPPING, labelencoder_X_1, onehotencoder, sc_X
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 sys.path.append(os.path.abspath("./model"))
 from flood.load import init
 
-# Initialize model
-model, graph = init()
+# Don't initialize model here - this creates circular dependency
+# Instead, initialize when needed
+model = None
+graph = None
+
+def initialize_model():
+    """Initialize the model when needed"""
+    global model, graph
+    if model is None:
+        model, graph = init()
+    return model, graph
 
 def get_state_and_terrain(state_code):
     """Get full state name and terrain from state code"""
@@ -64,34 +74,183 @@ def get_rainfall_data(state_symbol, quarter):
         print(f"Error getting rainfall data: {e}")
         return 0.0
 
-def predict_flood_severity(state, precipitation):
-    """Predict flood severity based on state and precipitation"""
+def predict_with_model(state, precipitation, terrain):
+    """Predict flood severity based on state, precipitation, and terrain"""
     try:
         # Get state encoding
         state_encoded = labelencoder_X_1.transform([state])[0]
+        
+        # Normalize the terrain to standard categories
+        normalized_terrain = normalize_terrain(terrain)
+        
+        # Encode terrain with standard categories
+        terrain_encoder = LabelEncoder()
+        standard_terrains = ['Desert', 'Plain', 'Coastal', 'Mountain', 'Plateau']
+        terrain_encoder.fit(standard_terrains)
+        
+        try:
+            terrain_encoded = terrain_encoder.transform([normalized_terrain])[0]
+        except ValueError:
+            print(f"Warning: Normalized terrain '{normalized_terrain}' not in standard list, using 'Plain'")
+            terrain_encoded = terrain_encoder.transform(['Plain'])[0]
+        
         print(f"State: {state}, encoded as: {state_encoded}")
+        print(f"Terrain: {terrain} (normalized to: {normalized_terrain}), encoded as: {terrain_encoded}")
         print(f"Precipitation: {precipitation}")
         
-        # Create direct input array
-        direct_x = np.zeros((1, 31), dtype=np.float64)
-        direct_x[0, 0] = float(state_encoded)
-        direct_x[0, -1] = float(precipitation)
+        # Create raw features array
+        raw_features = np.array([[state_encoded, terrain_encoded, float(precipitation)]])
         
-        print(f"Direct input shape: {direct_x.shape}")
-        print(f"Contains NaN: {np.isnan(direct_x).any()}")
+        # One-hot encode state
+        state_encoded_reshaped = raw_features[:, 0].reshape(-1, 1).astype(np.int32)
+        try:
+            state_onehot = onehotencoder.transform(state_encoded_reshaped)
+        except Exception as e:
+            print(f"Warning: Error encoding state: {e}. Using zeros.")
+            # Create a dummy state encoding with zeros
+            state_onehot = np.zeros((1, 30))  # Assuming up to 30 states
+            if state_encoded < 30:
+                state_onehot[0, state_encoded] = 1
         
-        # Convert to TensorFlow tensor explicitly
-        tf_input = tf.convert_to_tensor(direct_x, dtype=tf.float32)
+        # One-hot encode terrain
+        terrain_onehotencoder = OneHotEncoder(sparse_output=False)
+        # Fit with all possible terrain indices (0-4)
+        terrain_onehotencoder.fit(np.array([[0], [1], [2], [3], [4]]))
+        terrain_encoded_reshaped = raw_features[:, 1].reshape(-1, 1).astype(np.int32)
+        terrain_onehot = terrain_onehotencoder.transform(terrain_encoded_reshaped)
         
-        # Predict and get response
-        out = model.predict(tf_input)
+        # Combine one-hot encoded features with precipitation
+        precipitation_reshaped = raw_features[:, 2].reshape(-1, 1).astype(np.float32)
+        combined_features = np.hstack((state_onehot, terrain_onehot, precipitation_reshaped))
+        
+        # Scale features
+        scaled_features = sc_X.transform(combined_features)
+        
+        print(f"Input features shape: {scaled_features.shape}")
+        print(f"Contains NaN: {np.isnan(scaled_features).any()}")
+        
+        # Convert to TensorFlow tensor
+        tf_input = tf.convert_to_tensor(scaled_features, dtype=tf.float32)
+        
+        # Predict flood severity
+        model, graph = initialize_model()
+        with graph.as_default():
+            out = model.predict(tf_input)
         response = np.argmax(out, axis=1)[0]
-        print("predict response:", response)
+        print("Predicted severity:", response)
         
         return int(response)
     except Exception as e:
         print(f"Error in prediction: {e}")
+        import traceback
+        traceback.print_exc()
         return 0  # Default severity if prediction fails
+    
+def predict_flood_severity(state, precipitation, terrain):
+    """
+    Predict flood severity based on state, precipitation, and terrain,
+    by combining an ML model with rule-based overrides for extremes.
+    Severity ranges 0–5 (0 = no flood, 5 = severe flood).
+
+    Args:
+        state (str): State code (e.g. "WB", "AN", …)
+        precipitation (float): Precipitation in mm for the period
+        terrain (str): Terrain type string (e.g. "Coastal", "Hilly", …)
+
+    Returns:
+        int: Final severity prediction (0–5)
+    """
+    # 1. Get ML model prediction (assumed to return 0–5)
+    model_prediction = predict_with_model(state, precipitation, terrain)
+
+    # 2. Normalize terrain string
+    t = terrain.strip().lower()
+
+    # 3. Rule‑based overrides for each terrain group
+    # Coastal group (incl. plateau & mixed)
+    if t in {"coastal", "hilly/coastal", "coastal-plateau"}:
+        if precipitation > 1500:
+            return max(3, model_prediction)
+        elif precipitation > 1000:
+            return max(2, model_prediction)
+        elif precipitation > 500:
+            return max(1, model_prediction)
+
+    # Island
+    elif t == "island":
+        if precipitation > 2000:
+            return max(4, model_prediction)
+        elif precipitation > 1500:
+            return max(3, model_prediction)
+        elif precipitation > 800:
+            return max(2, model_prediction)
+
+    # Hilly + mixed plain/hilly
+    elif t in {"hilly", "hilly/plain"}:
+        if precipitation > 1800:
+            return max(3, model_prediction)
+        elif precipitation > 1200:
+            return max(2, model_prediction)
+        elif precipitation > 700:
+            return max(1, model_prediction)
+
+    # Plain‑land
+    elif t == "plain-land":
+        if precipitation > 1200:
+            return max(3, model_prediction)
+        elif precipitation > 800:
+            return max(2, model_prediction)
+        elif precipitation > 400:
+            return max(1, model_prediction)
+
+    # Desert
+    elif t == "desert":
+        if precipitation > 300:
+            return max(3, model_prediction)
+        elif precipitation > 200:
+            return max(2, model_prediction)
+        elif precipitation > 100:
+            return max(1, model_prediction)
+
+    # Desert/marsh
+    elif t == "desert/marsh":
+        if precipitation > 500:
+            return max(3, model_prediction)
+        elif precipitation > 300:
+            return max(2, model_prediction)
+        elif precipitation > 150:
+            return max(1, model_prediction)
+
+    # Forest
+    elif t == "forest":
+        if precipitation > 800:
+            return max(3, model_prediction)
+        elif precipitation > 500:
+            return max(2, model_prediction)
+        elif precipitation > 250:
+            return max(1, model_prediction)
+
+    # Rugged terrain (mountainous/complex)
+    elif t == "rugged":
+        if precipitation > 1500:
+            return max(3, model_prediction)
+        elif precipitation > 1000:
+            return max(2, model_prediction)
+        elif precipitation > 600:
+            return max(1, model_prediction)
+
+    # “Everything” or unrecognized terrains: use broad thresholds
+    else:
+        if precipitation > 1500:
+            return max(3, model_prediction)
+        elif precipitation > 1000:
+            return max(2, model_prediction)
+        elif precipitation > 500:
+            return max(1, model_prediction)
+
+    # If no override triggers, fall back to the ML prediction
+    return model_prediction
+
 
 def create_encoder_and_scaler():
     """Create and fit encoders and scaler"""
@@ -131,3 +290,32 @@ def create_encoder_and_scaler():
     y_train = onehotencoder_2.fit_transform(y_train)
     
     X_train = sc_X.fit_transform(X_train)
+
+def normalize_terrain(terrain):
+    """
+    Map various terrain descriptions to the five standard terrain categories:
+    Desert, Plain, Coastal, Mountain/Hilly, Plateau
+    """
+    terrain = str(terrain).strip().lower()
+    
+    # Check for partial matches to handle truncated strings like "Hilly/co"
+    if "desert" in terrain:
+        return "Desert"
+    elif any(x in terrain for x in ["plain", "plain-land", "barren"]):
+        return "Plain"
+    elif any(x in terrain for x in ["coast", "coastal", "/co"]):
+        return "Coastal"
+    elif any(x in terrain for x in ["hill", "mount", "hilly"]):
+        return "Mountain"  # Treating all hilly terrains as Mountain
+    elif "plateau" in terrain:
+        return "Plateau"
+    elif "island" in terrain:
+        return "Coastal"  # Islands treated as coastal
+    elif "forest" in terrain:
+        return "Mountain"  # Forests often in hilly regions
+    elif "marsh" in terrain:
+        return "Plain"  # Marshes treated as special plains
+    
+    # Default fallback
+    print(f"Warning: Unknown terrain '{terrain}', defaulting to Plain")
+    return "Plain"

@@ -320,33 +320,15 @@ def drought():
         # Predict drought
         precipitation, severity = predict_drought(location, year, month)
         
-        # Handle insufficient data case
-        if severity == "Insufficient Data":
-            return render_template(
-                "drought_insufficient.html",
-                state=location,
-                year=year,
-                month=month
-            )
-        
-        # Handle different drought scenarios
-        if severity == "No Drought":
-            return render_template(
-                "drought_no.html",
-                state=location,
-                year=year,
-                month=month,
-                precipitation=round(precipitation, 2)
-            )
-        else:
-            return render_template(
-                "drought_yes.html",
-                state=location,
-                year=year,
-                month=month,
-                precipitation=round(precipitation, 2),
-                severity=severity
-            )
+        # Now use a single template for all cases
+        return render_template(
+            "drought_predict.html",
+            state=location,
+            year=year,
+            month=month,
+            precipitation=round(precipitation, 2) if severity != "Insufficient Data" else 0,
+            severity=severity
+        )
             
     except Exception as e:
         return render_template('error.html', error=str(e))

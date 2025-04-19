@@ -1,51 +1,391 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Drought Prediction Result</title>
+    <title>Drought Prediction {% if severity != "Insufficient Data" %}- {{ severity }}{% endif %}</title>
+
+    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/bootstrap.min.css') }}">
+
+    <!-- FontAwesome CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/font-awesome.min.css') }}">
+
+    <!-- ElegantFonts CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/elegant-fonts.css') }}">
+
+    <!-- themify-icons CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/themify-icons.css') }}">
+
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/swiper.min.css') }}">
+
+    <!-- Styles -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/style.css') }}">
+
+    <style>
+        /* Custom styles for drought page */
+        .drought-hero {
+            min-height: 500px;
+            background: linear-gradient(to right, #f9f9f9, #e8e8e8);
+            position: relative;
+            padding-top: 60px;
+            padding-bottom: 60px;
+        }
+        
+        .drought-hero-overlay {
+            background-color: rgba(255, 255, 255, 0.85);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+        }
+        
+        .insufficient-box {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffeeba;
+            color: #856404;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .insufficient-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .info-box {
+            background-color: #d4edda;
+            border-left: 5px solid #c3e6cb;
+            color: #155724;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .info-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .warning-box {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffeeba;
+            color: #856404;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .warning-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .severe-warning {
+            background-color: #f8d7da;
+            border-left: 5px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .data-box {
+            background-color: #f8f9fa;
+            border-left: 5px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .data-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .recommendations {
+            background-color: #e2e3e5;
+            border-left: 5px solid #d6d8db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .recommendations:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .drought-action-items .icon-box {
+            padding: 40px 30px;
+            border-radius: 4px;
+            background-color: #fff;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            height: 100%;
+        }
+        
+        .drought-action-items .icon-box:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            color: inherit !important; /* Prevent text color change on hover */
+        }
+        
+        /* Ensuring text stays visible on hover */
+        .drought-action-items .icon-box:hover h3,
+        .drought-action-items .icon-box:hover p,
+        .drought-action-items .icon-box:hover .number {
+            color: inherit !important;
+        }
+        
+        .entry-title {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .entry-content p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .number {
+            width: 50px;
+            height: 50px;
+            background-color: #f8f9fa;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        /* Full-width content boxes */
+        .full-width-box {
+            width: 100%;
+            max-width: 100%;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5 text-center">
-        <h1 class="mb-4">
-            {% if severity == '0' %}
-                No Drought Detected
-            {% elif severity == '1' %}
-                Slight Dry Spell Expected
-            {% elif severity == '2' %}
-                Mild Drought Warning
-            {% elif severity == '3' %}
-                Moderate Drought Alert
-            {% elif severity == '4' %}
-                Severe Drought Conditions
-            {% elif severity == '5' %}
-                Extreme Drought Emergency
-            {% endif %}
-        </h1>
 
-        <p>
-            {% if severity == '0' %}
-                Conditions appear normal for your selected region and time period.
-            {% elif severity == '1' %}
-                Keep an eye on irrigation and rainfall patterns; minor dry spells might occur.
-            {% elif severity == '2' %}
-                Water stress may affect crops and availability slightly — consider precautionary steps.
-            {% elif severity == '3' %}
-                Drought conditions likely — ensure water conservation and preparedness.
-            {% elif severity == '4' %}
-                Severe drought is expected — take critical steps to manage resources.
-            {% elif severity == '5' %}
-                Extreme drought threat — initiate emergency water and crop management strategies.
-            {% endif %}
-        </p>
+    <!-- Hero Section - Swiper Container -->
+    <div class="swiper-container">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide drought-hero">
+                <div class="container h-100">
+                    <div class="row h-100">
+                        <div class="col-12 col-lg-10 mx-auto d-flex flex-column justify-content-center">
+                            <div class="drought-hero-overlay">
+                                {% if severity == "Insufficient Data" %}
+                                    <header class="entry-header text-center">
+                                        <h1>Drought Prediction - Insufficient Data</h1>
+                                    </header>
+                                {% else %}
+                                    <header class="entry-header text-center">
+                                        <h1>Drought Prediction Results</h1>
+                                    </header>
+                                {% endif %}
 
-        {% if prediction %}
-            <h3 class="mt-4">Prediction Result: {{ prediction }}</h3>
-        {% endif %}
+                                {% if severity == "Insufficient Data" %}
+                                    <!-- INSUFFICIENT DATA CONTENT -->
+                                    <div class="insufficient-box full-width-box">
+                                        <h2>Location: {{ state }}</h2>
+                                        <p>Date: {{ month }} {{ year }}</p>
+                                        <p>We don't have enough historical data to make a reliable drought prediction for this location.</p>
+                                        <p>This could be because:</p>
+                                        <ul>
+                                            <li>The location is not in our database</li>
+                                            <li>There is insufficient historical weather data</li>
+                                            <li>The location name might be misspelled</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="data-box full-width-box">
+                                        <p>Please try:</p>
+                                        <ul>
+                                            <li>Checking the spelling of the location</li>
+                                            <li>Using a nearby major city or state</li>
+                                            <li>Contacting support if you believe this is an error</li>
+                                        </ul>
+                                    </div>
+                                
+                                {% elif severity == "No Drought" %}
+                                    <!-- NO DROUGHT CONTENT -->
+                                    <div class="info-box full-width-box">
+                                        <h2>Good News!</h2>
+                                        <p>Based on our analysis, there is no drought predicted for your location.</p>
+                                    </div>
+                                    
+                                    <div class="data-box full-width-box">
+                                        <h2>Location Details</h2>
+                                        <p><strong>State:</strong> {{ state }}</p>
+                                        <p><strong>Date:</strong> {{ month }} {{ year }}</p>
+                                        <p><strong>Precipitation:</strong> {{ precipitation }} mm</p>
+                                    </div>
+                                    
+                                    <div class="info-box full-width-box">
+                                        <h3>What This Means</h3>
+                                        <p>The current precipitation levels are within normal ranges for this location and time of year.</p>
+                                        <p>However, it's always good to:</p>
+                                        <ul>
+                                            <li>Continue monitoring weather conditions</li>
+                                            <li>Practice water conservation</li>
+                                            <li>Stay informed about local weather advisories</li>
+                                        </ul>
+                                    </div>
+                                    
+                                {% else %}
+                                    <!-- DROUGHT DETECTED CONTENT -->
+                                    <div class="warning-box full-width-box {% if severity == 'Severe Drought' %}severe-warning{% endif %}">
+                                        <h2>Drought Alert: {{ severity }}</h2>
+                                        <p>A {{ severity.lower() }} has been predicted for your location.</p>
+                                    </div>
+                                    
+                                    <div class="data-box full-width-box">
+                                        <h2>Location Details</h2>
+                                        <p><strong>State:</strong> {{ state }}</p>
+                                        <p><strong>Date:</strong> {{ month }} {{ year }}</p>
+                                        <p><strong>Precipitation:</strong> {{ precipitation }} mm</p>
+                                        <p><strong>Severity:</strong> {{ severity }}</p>
+                                    </div>
+                                    
+                                    <div class="recommendations full-width-box">
+                                        <h3>Recommended Actions</h3>
+                                        <ul>
+                                            <li>Implement water conservation measures</li>
+                                            <li>Monitor local water restrictions</li>
+                                            <li>Consider drought-resistant landscaping</li>
+                                            <li>Stay updated with local weather forecasts</li>
+                                            <li>Follow local government drought advisories</li>
+                                        </ul>
+                                        
+                                        {% if severity == 'Severe Drought' %}
+                                        <div class="warning-box severe-warning mt-4">
+                                            <h4>Additional Severe Drought Measures</h4>
+                                            <ul>
+                                                <li>Implement emergency water conservation plans</li>
+                                                <li>Prepare for potential water restrictions</li>
+                                                <li>Consider alternative water sources</li>
+                                                <li>Monitor crop and livestock conditions closely</li>
+                                            </ul>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
 
-        <a href="{{ url_for('drought') }}" class="btn btn-warning mt-4">Predict Again</a>
+                                <footer class="entry-footer d-flex flex-wrap align-items-center mt-4">
+                                    <a href="/" class="btn gradient-bg mr-2">Return to Home</a>
+                                </footer>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    {% if severity != "Insufficient Data" %}
+    <!-- Drought Action Items -->
+    <div class="home-page-icon-boxes drought-action-items mt-5" id="actions">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="text-center mb-5">Drought Action Plan</h2>
+                </div>
+                <div class="col-12 col-md-4 mt-4 mt-md-0">
+                    <div class="icon-box">
+                        <div class="d-flex justify-content-center number">
+                            <p>1</p>
+                        </div>
+
+                        <header class="entry-header">
+                            <h3 class="entry-title">Before a Drought</h3>
+                        </header>
+
+                        <div class="entry-content">
+                            <p>Conserve water in your home and garden. Install water-efficient fixtures. Learn about your community's water supply and drought response plans. Plant drought-resistant landscaping. Check for water leaks in pipes, toilets, and faucets.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-4 mt-4 mt-md-0">
+                    <div class="icon-box">
+                        <div class="d-flex justify-content-center number">
+                            <p>2</p>
+                        </div>
+
+                        <header class="entry-header">
+                            <h3 class="entry-title">During a Drought</h3>
+                        </header>
+
+                        <div class="entry-content">
+                            <p>Follow local water restrictions. Prioritize water use for essential needs. Reuse water when possible (e.g., using shower water for plants). Limit outdoor watering to early morning or evening hours. Report water waste in your community.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-4 mt-4 mt-md-0">
+                    <div class="icon-box">
+                        <div class="d-flex justify-content-center number">
+                            <p>3</p>
+                        </div>
+
+                        <header class="entry-header">
+                            <h3 class="entry-title">Long-Term Planning</h3>
+                        </header>
+
+                        <div class="entry-content">
+                            <p>Consider rainwater harvesting systems. Investigate greywater recycling for your home. Support local water conservation initiatives. Learn about climate-resilient agriculture practices. Stay informed about drought conditions in your area.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Scripts -->
+    <script type='text/javascript' src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+    <script type='text/javascript' src="{{ url_for('static', filename='js/jquery.collapsible.min.js') }}"></script>
+    <script type='text/javascript' src="{{ url_for('static', filename='js/swiper.min.js') }}"></script>
+    <script type='text/javascript' src="{{ url_for('static', filename='js/jquery.countdown.js') }}"></script>
+    <script type='text/javascript' src="{{ url_for('static', filename='js/jquery.countTo.min.js') }}"></script>
+    <script type='text/javascript' src="{{ url_for('static', filename='js/jquery.barfiller.js') }}"></script>
+    <script type='text/javascript' src="{{ url_for('static', filename='js/custom.js') }}"></script>
+
+    <script>
+    $(document).ready(function() {
+        // Initialize Swiper
+        var swiper = new Swiper('.swiper-container', {
+            loop: false,
+            autoplay: false,
+            slidesPerView: 1
+        });
+        
+        // Add hover effects with text color protection
+        $('.data-box, .info-box, .warning-box, .recommendations').hover(
+            function() {
+                $(this).css('transform', 'translateY(-5px)');
+                $(this).css('box-shadow', '0 10px 20px rgba(0,0,0,0.1)');
+            },
+            function() {
+                $(this).css('transform', 'translateY(0)');
+                $(this).css('box-shadow', '0 5px 20px rgba(0,0,0,0.05)');
+            }
+        );
+    });
+    </script>
 </body>
 </html>

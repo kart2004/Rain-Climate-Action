@@ -73,6 +73,22 @@
                                         {% endif %}
                                     </p>
                                 </div>
+                                <header class="entry-content mt-6 fs-4">
+                                    <h2>
+                                        {% if rf <= 50 %}
+                                            <p>Hooray, no chances of erosion here!</p>
+                                        {% elif 50 < rf <= 100 %}
+                                            <p>Low chances of erosion. R-factor is {{ rf }}</p>
+                                        {% elif 100 < rf <= 250 %}
+                                            <p>Moderate erosion risk. Be cautious! R-factor is {{ rf }}</p>
+                                        {% elif 250 < rf <= 500 %}
+                                            <p>High erosion risk. Take precautions! R-factor is {{ rf }}</p>
+                                        {% else %}
+                                            <p>Severe erosion risk. Immediate action needed! R-factor is {{ rf }}</p>
+                                        {% endif %}
+
+                                    </h2>
+                                </header>
 
                                 <footer class="entry-footer d-flex flex-wrap align-items-center mt-5">
                                     <a href="{{ url_for('index') }}" class="btn blue-border mr-2">Predict Again</a>

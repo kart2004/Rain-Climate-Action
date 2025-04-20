@@ -277,7 +277,8 @@ def predict():
             duration=duration, 
             precipitation=round(precipitation, 2), 
             terrain=terrain, 
-            year=year
+            year=year,
+            rf = int(precipitation / 2)
         )
     # For years > 2015, predict using model
     else:
@@ -297,7 +298,8 @@ def predict():
                 duration=duration, 
                 precipitation=round(precipitation, 2), 
                 terrain=terrain, 
-                year=year
+                year=year,
+                rf = precipitation/2
             )
         except Exception as e:
             return render_template('error.html', error=str(e), city=city, state=state)

@@ -570,7 +570,9 @@ def summary_results():
         landslide_summary=""
         landslide_probability=predict_landslide(flood_precipitation,location)
         final_prediction=""
-        print(f'Probability is {landslide_probability}')
+        #print(f'Probability is {landslide_probability}')
+        if isinstance(landslide_probability,tuple):
+            landslide_probability=0
         if(landslide_probability>0.8):
             final_prediction="Landslide risk exist"
             landslide_summary="Based on our analysis your area is under threat of a landslide , evacuative measures are suggested"
@@ -583,7 +585,9 @@ def summary_results():
         elif(landslide_probability>=0.5 and landslide_probability < 0.8):
             final_prediction="Moderate risk"
             landslide_summary="Based on our analysis there is a moderate risk of landslide , be prepared "
-        
+        else:
+            final_prediction="Insufficient data"
+            landslide_summary="Due to insufficient data, analysis cannot be made in your region"
 
         return render_template(
             'prediction_summary.html',

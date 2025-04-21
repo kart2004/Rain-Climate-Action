@@ -46,43 +46,129 @@ def index():
     return render_template("index.html")
 
 # Route to handle login and redirect to prediction page
-@app.route('/grantaccess', methods=['POST', 'GET'])
-def login():
-    if request.method == 'POST':
+@app.route('/grantaccess', methods=['POST'])
+def grantaccess():
+    try:
+        location = request.form.get('location')
+        date = request.form.get('date')
+        
+        # Map common cities to their state codes
+        city_to_state = {
+            'New Delhi': 'DL',
+            'Delhi': 'DL',
+            'Mumbai': 'MH',
+            'Chennai': 'TN',
+            'Kolkata': 'WB',
+            'Bengaluru': 'KA',
+            'Hyderabad': 'AD',
+            'Ahmedabad': 'GJ',
+            'Pune': 'MH',
+            'Jaipur': 'RJ',
+            'Lucknow': 'UP',
+            'Kanpur': 'UP',
+            'Nagpur': 'MH',
+            'Indore': 'MP',
+            'Thane': 'MH',
+            'Bhopal': 'MP',
+            'Visakhapatnam': 'AD',
+            'Patna': 'BR',
+            'Vadodara': 'GJ',
+            'Ghaziabad': 'UP',
+            'Ludhiana': 'PB',
+            'Agra': 'UP',
+            'Nashik': 'MH',
+            'Faridabad': 'HR',
+            'Meerut': 'UP',
+            'Rajkot': 'GJ',
+            'Kalyan': 'MH',
+            'Vasai': 'MH',
+            'Varanasi': 'UP',
+            'Srinagar': 'JK',
+            'Aurangabad': 'MH',
+            'Dhanbad': 'JH',
+            'Amritsar': 'PB',
+            'Navi Mumbai': 'MH',
+            'Allahabad': 'UP',
+            'Ranchi': 'JH',
+            'Howrah': 'WB',
+            'Coimbatore': 'TN',
+            'Jabalpur': 'MP',
+            'Gwalior': 'MP',
+            'Vijayawada': 'AD',
+            'Jodhpur': 'RJ',
+            'Madurai': 'TN',
+            'Raipur': 'CG',
+            'Kota': 'RJ',
+            'Chandigarh': 'CH',
+            'Guwahati': 'AS',
+            'Solapur': 'MH',
+            'Hubli': 'KA',
+            'Mysore': 'KA',
+            'Tiruchirappalli': 'TN',
+            'Bareilly': 'UP',
+            'Moradabad': 'UP',
+            'Tiruppur': 'TN'
+        }
+        
+        # Get state code from city name
+        state_code = city_to_state.get(location)
+        if not state_code:
+            # If city not found in mapping, use the location as state code
+            state_code = location
+        
         try:
-            # Get form data
-            location = request.form.get('location')
-            date = request.form.get('date')
-            prediction_type = request.form.get('prediction_type')
-            
-            # Validate required fields
-            if not all([location, date]):
-                return render_template('error.html', error="Please provide both location and date")
-            
-            # Process date
+            # Try to parse date in different formats
             try:
-                year = date[:4]
-                datetemp = datetime.strptime(date, '%Y-%m-%d').strftime('%d/%m/%y')
+                date_obj = datetime.strptime(date, '%B %Y')
             except ValueError:
-                return render_template('error.html', error="Invalid date format. Please use YYYY-MM-DD format")
+                try:
+                    date_obj = datetime.strptime(date, '%Y-%m-%d')
+                except ValueError:
+                    date_obj = datetime.strptime(date, '%d/%m/%y')
             
-            # Handle different prediction types
-            if prediction_type == 'drought':
-                return redirect(url_for('drought', 
-                    location=location.strip(), 
-                    date=datetemp, 
-                    year=year
-                ))
-            else:  # flood prediction
-                return redirect(url_for('jsonlocation', 
-                    location=location.strip(), 
-                    date=datetemp, 
-                    year=year
-                ))
-        except Exception as e:
-            return render_template('error.html', error=f"An error occurred: {str(e)}")
-    else:
-        return redirect(url_for('index'))
+            year = date_obj.year
+            month = date_obj.month
+            
+        except ValueError as e:
+            return render_template('error.html', error=f"Invalid date format: {str(e)}")
+        
+        # Get state details and month details
+        state_name, terrain = get_state_and_terrain(state_code)
+        quarter, duration = get_month_details(month)
+        
+        # Get precipitation based on year
+        if year <= 2015:
+            precipitation, severity = get_historical_data(state_name, year, quarter, terrain)
+        else:
+            precipitation = get_rainfall_data(state_code, quarter)
+            
+        if precipitation == 0.0:
+            # If no data found, use the generated data
+            precipitation = get_rainfall_data(state_code, quarter)
+        
+        # Normalize precipitation for the duration
+        precipitation = normalize_precipitation(precipitation, duration)
+        
+        # Store the precipitation value in session
+        session['precipitation'] = precipitation
+        
+        # Determine drought severity
+        if precipitation < 50:
+            severity = "High Risk of Drought"
+            summary = "Warning: High risk of drought detected. Immediate water conservation measures required."
+        else:
+            severity = "No Drought Risk"
+            summary = "No significant drought risk detected. Continue normal water usage with conservation practices."
+            
+        return render_template('drought_predict.html',
+                             location=location,
+                             date=date,
+                             precipitation=precipitation,
+                             severity=severity,
+                             summary=summary)
+                             
+    except Exception as e:
+        return render_template('error.html', error=f"Sorry, something went wrong: {str(e)}")
 
 # Location route to get location data from the Bing API
 @app.route('/location', methods=['GET', 'POST'])
@@ -328,33 +414,29 @@ def predict():
 # Route for Drought Prediction page
 @app.route('/drought')
 def drought():
-    # Get parameters from the initial form
-    location = request.args.get('location')
-    date = request.args.get('date')
-    year = request.args.get('year')
-    
-    if not all([location, date, year]):
-        return render_template('error.html', error="Missing required parameters from initial form")
-    
     try:
-        # Process date to get month name
-        month = datetime.strptime(date, '%d/%m/%y').strftime('%B')
+        # Get values from request args
+        location = request.args.get('location')
+        date = request.args.get('date')
+        precipitation = float(request.args.get('precipitation', 0.0))
         
-        # Predict drought
-        precipitation, severity = predict_drought(location, year, month)
-        
-        # Now use a single template for all cases
-        return render_template(
-            "drought_predict.html",
-            state=location,
-            year=year,
-            month=month,
-            precipitation=round(precipitation, 2) if severity != "Insufficient Data" else 0,
-            severity=severity
-        )
+        # Determine drought severity
+        if precipitation < 50:
+            severity = "High Risk of Drought"
+            summary = "Warning: High risk of drought detected. Immediate water conservation measures required."
+        else:
+            severity = "No Drought Risk"
+            summary = "No significant drought risk detected. Continue normal water usage with conservation practices."
             
+        return render_template('drought_predict.html',
+                             location=location,
+                             date=date,
+                             precipitation=precipitation,
+                             severity=severity,
+                             summary=summary)
+                             
     except Exception as e:
-        return render_template('error.html', error=str(e))
+        return render_template('error.html', error=f"Sorry, something went wrong: {str(e)}")
 
 # Add this new route after your existing routes
 @app.route('/landslide',methods=['GET','POST'])
@@ -398,37 +480,33 @@ def summary_results():
         except ValueError:
             return render_template('error.html', error="Invalid date format. Please use YYYY-MM-DD format")
         
-        # Get state code and terrain
+        # Get location data from Bing Maps API
+        url = 'http://dev.virtualearth.net/REST/v1/Locations?'
+        key = BING_API_KEY
+        cr = 'IN'
+        results = url + urllib.parse.urlencode(({'CountryRegion': cr, 'locality': location, 'key': key}))
+        response = requests.get(results)
+        parser = response.json()
+        
+        if parser['statusDescription'] != 'OK':
+            return render_template('error.html', error="Could not retrieve location data. Please try again.")
+            
+        if 'adminDistrict' not in parser['resourceSets'][0]['resources'][0]['address']:
+            return render_template('error.html', error="Location does not exist in India! Please try again!")
+            
+        # Get state name from Bing Maps response
+        state = parser['resourceSets'][0]['resources'][0]['address']['adminDistrict']
+        city = parser['resourceSets'][0]['resources'][0]['address']['locality']
+        
+        # Find state code from state name
         state_code = None
         for code, details in STATE_MAPPING.items():
-            if details["full_name"].lower() == location.lower() or code.lower() == location.lower():
+            if details["full_name"].lower() == state.lower() or code.lower() == state.lower():
                 state_code = code
                 break
-        
-        if not state_code:
-            # Try to get location data from Bing Maps
-            url = 'http://dev.virtualearth.net/REST/v1/Locations?'
-            key = BING_API_KEY
-            cr = 'IN'
-            results = url + urllib.parse.urlencode(({'CountryRegion': cr, 'locality': location, 'key': key}))
-            response = requests.get(results)
-            parser = response.json()
-            
-            if parser['statusDescription'] == 'OK':
-                if 'adminDistrict' not in parser['resourceSets'][0]['resources'][0]['address']:
-                    return render_template('error.html', error="Location does not exist in India! Please try again!")
-                state = parser['resourceSets'][0]['resources'][0]['address']['adminDistrict']
                 
-                # Find state code from state name
-                for code, details in STATE_MAPPING.items():
-                    if details["full_name"].lower() == state.lower() or code.lower() == state.lower():
-                        state_code = code
-                        break
-            else:
-                return render_template('error.html', error="Could not retrieve location data. Please try again.")
-        
         if not state_code:
-            return render_template('error.html', error="State not found in our database. Please try another location.")
+            return render_template('error.html', error=f"State '{state}' not found in our database. Please try another location.")
         
         # Get state details
         quarter, duration = get_month_details(month_num)
@@ -438,8 +516,8 @@ def summary_results():
         flood_precipitation = get_rainfall_data(state_code, quarter)
         flood_severity = predict_flood_severity(state_name, flood_precipitation, terrain)
         
-        # Get drought prediction data
-        drought_precipitation, drought_severity = predict_drought(location, year, month_name)
+        # Get drought prediction data using flood's precipitation
+        drought_severity = predict_drought(location, year, month_name, flood_precipitation)
         
         # Create summary text based on severity
         flood_severity_text = ""
@@ -475,10 +553,7 @@ def summary_results():
         drought_summary = ""
         drought_severity_percentage = 0
         
-        if drought_severity == "Insufficient Data":
-            drought_summary = "We don't have enough historical data to make a reliable drought prediction for this location."
-            drought_severity_percentage = 0
-        elif drought_severity == "No Drought":
+        if drought_severity == "No Drought":
             drought_summary = "Based on our analysis, there is no drought predicted for your location."
             drought_severity_percentage = 10
         elif drought_severity == "Mild Drought":
@@ -512,7 +587,8 @@ def summary_results():
 
         return render_template(
             'prediction_summary.html',
-            location=location,
+            location=city,  # Use city name from Bing Maps
+            state=state,    # Add state name
             month=month_name,
             year=year,
             date=formatted_date,
@@ -522,7 +598,7 @@ def summary_results():
             flood_severity_text=flood_severity_text,
             flood_summary=flood_summary,
             flood_severity_percentage=flood_severity_percentage,
-            drought_precipitation=round(drought_precipitation, 2) if drought_severity != "Insufficient Data" else 0,
+            drought_precipitation=round(flood_precipitation, 2),  # Use same precipitation as flood
             drought_severity=drought_severity,
             drought_summary=drought_summary,
             drought_severity_percentage=drought_severity_percentage,

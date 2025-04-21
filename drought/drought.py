@@ -1,123 +1,91 @@
 import pandas as pd
 import numpy as np
-from sklearn.linear_model import LinearRegression
-from datetime import datetime
+from flood.config import STATE_MAPPING, MONTH_MAPPING
+from flood.flood import (
+    get_state_and_terrain,
+    get_month_details,
+    get_historical_data,
+    get_rainfall_data,
+    predict_with_model
+)
 
-def get_historical_drought_data(state, year, month):
+def get_normal_rainfall(state, month):
     """
-    Get historical drought data for a specific state, year, and month.
-    Returns precipitation and drought severity.
+    Get normal rainfall for a state and month based on historical data.
+    Returns the average rainfall in mm.
     """
     try:
-        print(f"Getting historical data for {state}, {year}, {month}")
-        # Read historical data
-        df = pd.read_csv("data/flood_past.csv")
-        print(f"Total records in dataset: {len(df)}")
+        # Get historical data for the last 10 years
+        years = range(2005, 2016)
+        total_rainfall = 0
+        count = 0
         
-        # Filter data for the specific state
-        state_data = df[df['SUBDIVISION'] == state]
-        print(f"Records for {state}: {len(state_data)}")
-        
-        if len(state_data) == 0:
-            print(f"No data found for {state}")
-            return None, "Insufficient Data"
+        for year in years:
+            state_name, terrain = get_state_and_terrain(state)
+            quarter, duration = get_month_details(month)
+            rainfall, _ = get_historical_data(state_name, str(year), quarter, terrain)
             
-        # Calculate average precipitation
-        avg_precip = state_data['PRECIPITATION'].mean()
-        print(f"Average precipitation for {state}: {avg_precip}")
+            if rainfall > 0:
+                total_rainfall += rainfall
+                count += 1
         
-        # Get precipitation for the specific year if available
-        year_data = state_data[state_data['YEAR'] == int(year)]
-        if len(year_data) > 0:
-            precip = year_data['PRECIPITATION'].iloc[0]
-            print(f"Found precipitation for {year}: {precip}")
-        else:
-            # If no data for specific year, use average
-            precip = avg_precip
-            print(f"Using average precipitation for {year}: {precip}")
-            
-        # Determine drought severity based on precipitation
-        if precip < avg_precip * 0.5:
-            severity = "Severe Drought"
-        elif precip < avg_precip * 0.75:
-            severity = "Moderate Drought"
-        elif precip < avg_precip * 0.9:
-            severity = "Mild Drought"
-        else:
-            severity = "No Drought"
-            
-        print(f"Calculated severity: {severity}")
-        return precip, severity
-        
+        if count > 0:
+            return total_rainfall / count
+        return 0
     except Exception as e:
-        print(f"Error in get_historical_drought_data: {str(e)}")
-        raise Exception(f"Error getting historical drought data: {str(e)}")
+        print(f"Error getting normal rainfall: {str(e)}")
+        return 0
 
-def predict_drought(state, year, month):
+def classify_drought_severity(current_rainfall, normal_rainfall):
     """
-    Predict drought conditions for a given state, year, and month.
-    Returns precipitation and drought severity.
+    Classify drought severity based on IMD criteria and precipitation threshold:
+    - If precipitation < 50mm: At least Mild Drought
+    - Then check IMD deficiency criteria:
+      - Normal: Within 19% of normal
+      - Mild Drought: 20-59% deficiency
+      - Moderate Drought: 60-99% deficiency
+      - Severe Drought: 100% deficiency
+    """
+    if normal_rainfall == 0:
+        return "No Drought"
+        
+    # First check precipitation threshold
+    if current_rainfall < 50:
+        # If below threshold, check IMD deficiency to determine severity
+        deficiency = ((normal_rainfall - current_rainfall) / normal_rainfall) * 100
+        
+        if deficiency < 60:
+            return "Mild Drought"
+        elif deficiency < 100:
+            return "Moderate Drought"
+        else:
+            return "Severe Drought"
+    else:
+        # If above threshold, use only IMD criteria
+        deficiency = ((normal_rainfall - current_rainfall) / normal_rainfall) * 100
+        
+        if deficiency < 20:
+            return "No Drought"
+        elif deficiency < 60:
+            return "Mild Drought"
+        elif deficiency < 100:
+            return "Moderate Drought"
+        else:
+            return "Severe Drought"
+
+def predict_drought(state, year, month, flood_precipitation):
+    """
+    Predict drought conditions using flood.py's precipitation value.
+    Returns drought severity based on simple threshold:
+    - High Risk: precipitation < 50mm
+    - Otherwise: No Drought
     """
     try:
-        # Read historical data
-        df = pd.read_csv("data/flood_past.csv")
-        
-        # Filter data for the specific state
-        state_data = df[df['SUBDIVISION'] == state]
-        
-        if len(state_data) == 0:
-            # If no data for the state, use overall average
-            avg_precip = df['PRECIPITATION'].mean()
-            precip = avg_precip
-        else:
-            # Calculate average precipitation for the state
-            avg_precip = state_data['PRECIPITATION'].mean()
-            
-            # Get precipitation for the specific year if available
-            year_data = state_data[state_data['YEAR'] == int(year)]
-            if len(year_data) > 0:
-                precip = year_data['PRECIPITATION'].iloc[0]
-            else:
-                # If no data for specific year, use state average
-                precip = avg_precip
-        
-        # Get terrain type for the state
-        terrain = state_data['TERRAIN'].iloc[0] if len(state_data) > 0 else "Unknown"
-        
-        # Adjust thresholds based on terrain type
-        if terrain.lower() in ['desert', 'desert/marsh']:
-            # Lower thresholds for desert regions
-            if precip < avg_precip * 0.3:
-                severity = "Severe Drought"
-            elif precip < avg_precip * 0.5:
-                severity = "Moderate Drought"
-            elif precip < avg_precip * 0.7:
-                severity = "Mild Drought"
-            else:
-                severity = "No Drought"
-        elif terrain.lower() in ['plain-land', 'coastal']:
-            # Moderate thresholds for plain and coastal regions
-            if precip < avg_precip * 0.4:
-                severity = "Severe Drought"
-            elif precip < avg_precip * 0.6:
-                severity = "Moderate Drought"
-            elif precip < avg_precip * 0.8:
-                severity = "Mild Drought"
-            else:
-                severity = "No Drought"
-        else:
-            # Standard thresholds for other regions
-            if precip < avg_precip * 0.5:
-                severity = "Severe Drought"
-            elif precip < avg_precip * 0.7:
-                severity = "Moderate Drought"
-            elif precip < avg_precip * 0.9:
-                severity = "Mild Drought"
-            else:
-                severity = "No Drought"
-            
-        return precip, severity
+        # Simple threshold check
+        if flood_precipitation < 50:
+            return "High Risk of Drought"
+        return "No Drought"
         
     except Exception as e:
-        # If any error occurs, return a default prediction
-        return 100.0, "No Drought"  # Default to no drought with average precipitation
+        print(f"Error in drought prediction: {str(e)}")
+        return "No Drought"

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Climate Prediction Summary</title>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/bootstrap.min.css') }}">
+
+    <!-- FontAwesome CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/font-awesome.min.css') }}">
+
+    <!-- ElegantFonts CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/elegant-fonts.css') }}">
+
+    <!-- themify-icons CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/themify-icons.css') }}">
+
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/swiper.min.css') }}">
+
+    <!-- Styles -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/style.css') }}">
+
+    <style>
+        .hero-section {
+            min-height: 300px;
+            background: linear-gradient(to right, rgba(83, 103, 118, 0.8), rgba(41, 46, 73, 0.8)), 
+                        url("{{ url_for('static', filename='images/climate-bg.jpg') }}") no-repeat center;
+            background-size: cover;
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+        
+        .prediction-card {
+            border-radius: 8px;
+            margin-bottom: 30px;
+            transition: all 0.3s;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .prediction-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+        
+        .card-header {
+            padding: 20px;
+            color: white;
+        }
+        
+        .flood-header {
+            background: linear-gradient(to right, #3494e6, #ec6ead);
+        }
+        
+        .drought-header {
+            background: linear-gradient(to right, #ff9966, #ff5e62);
+        }
+        
+        .card-body {
+            padding: 30px;
+        }
+        
+        .details-btn {
+            display: inline-block;
+            padding: 10px 25px;
+            background-color: #f5f5f5;
+            color: #333;
+            border-radius: 30px;
+            text-decoration: none;
+            transition: all 0.3s;
+            margin-top: 15px;
+            border: 1px solid #ddd;
+        }
+        
+        .flood-btn:hover {
+            background-color: #3494e6;
+            color: white;
+            border-color: #3494e6;
+        }
+        
+        .drought-btn:hover {
+            background-color: #ff5e62;
+            color: white;
+            border-color: #ff5e62;
+        }
+        
+        .severity-indicator {
+            display: inline-block;
+            width: 100%;
+            height: 20px;
+            background-color: #f1f1f1;
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .severity-bar {
+            height: 100%;
+            border-radius: 10px;
+        }
+        
+        .flood-bar {
+            background: linear-gradient(to right, #3aa0ff, #3461ff);
+        }
+        .drought-bar {
+            background: linear-gradient(to right, #f5b041, #ff5e62);
+        }
+        
+        .location-info {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .back-home {
+            margin-top: 30px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h1>Climate Prediction Summary</h1>
+                    <p>For {{ location }}, {{ month }} {{ year }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-12 text-center mb-4">
+                <h2>Our Analysis Results</h2>
+                <p>Here's what our prediction models found for your location and date</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Flood Prediction Card -->
+            <div class="col-md-6">
+                <div class="prediction-card">
+                    <div class="card-header flood-header">
+                        <h3>Flood Prediction</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="location-info">
+                            <p><strong>Location:</strong> {{ location }}</p>
+                            <p><strong>Date:</strong> {{ month }} {{ year }}</p>
+                            <p><strong>Precipitation:</strong> {{ flood_precipitation }} mm</p>
+                            <p><strong>Terrain:</strong> {{ terrain }}</p>
+                        </div>
+                        
+                        <h4>Flood Risk: {{ flood_severity_text }}</h4>
+                        <div class="severity-indicator">
+                            <div class="severity-bar flood-bar" style="width: {{ flood_severity_percentage }}%;"></div>
+                        </div>
+                        
+                        <p>{{ flood_summary }}</p>
+                        
+                        <form action="{{ url_for('predict') }}" method="POST">
+                            <input type="hidden" name="state" value="{{ location }}">
+                            <input type="hidden" name="precipitation" value="{{ flood_precipitation }}">
+                            <input type="hidden" name="month" value="{{ month }}">
+                            <input type="hidden" name="terrain" value="{{ terrain }}">
+                            <input type="hidden" name="year" value="{{ year }}">
+                            <input type="hidden" name="city" value="{{ location }}">
+                            <input type="hidden" name="duration" value="{{ duration }}">
+                            <input type="hidden" name="actualMonth" value="{{ actual_month }}">
+                            <input type="hidden" name="state_symbol" value="{{ state_code }}">
+                            <button type="submit" class="details-btn flood-btn">View Detailed Flood Report</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Drought Prediction Card -->
+            <div class="col-md-6">
+                <div class="prediction-card">
+                    <div class="card-header drought-header">
+                        <h3>Drought Prediction</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="location-info">
+                            <p><strong>Location:</strong> {{ location }}</p>
+                            <p><strong>Date:</strong> {{ month }} {{ year }}</p>
+                            <p><strong>Precipitation:</strong> {{ drought_precipitation }} mm</p>
+                        </div>
+                        
+                        <h4>Drought Risk: {{ drought_severity }}</h4>
+                        <div class="severity-indicator">
+                            <div class="severity-bar drought-bar" style="width: {{ drought_severity_percentage }}%"></div>
+                        </div>
+                        
+                        <p>{{ drought_summary }}</p>
+                        
+                        <a href="{{ url_for('drought', location=location, date=date, year=year) }}" class="details-btn drought-btn">View Detailed Drought Report</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="back-home">
+            <a href="{{ url_for('index') }}" class="btn gradient-bg">Return to Home</a>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type='text/javascript' src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+    <script type='text/javascript' src="{{ url_for('static', filename='js/jquery.collapsible.min.js') }}"></script>
+    <script type='text/javascript' src="{{ url_for('static', filename='js/swiper.min.js') }}"></script>
+</body>
+</html>

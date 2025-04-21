@@ -231,9 +231,27 @@ def interim():
 # Flood prediction route
 @app.route('/predict', methods=['GET', 'POST'])
 def predict():
-    state = request.args.get('state')
-    precip_str = request.args.get('precipitation')
-    year = request.args.get('year')
+    # Get parameters from either query string or form data
+    if request.method == 'POST':
+        state = request.form.get('state')
+        precip_str = request.form.get('precipitation')
+        year = request.form.get('year')
+        month = request.form.get('month')
+        terrain = request.form.get('terrain')
+        actualMonth = request.form.get('actualMonth')
+        state_symbol = request.form.get('state_symbol')
+        city = request.form.get('city')
+        duration = request.form.get('duration')
+    else:
+        state = request.args.get('state')
+        precip_str = request.args.get('precipitation')
+        year = request.args.get('year')
+        month = request.args.get('month')
+        terrain = request.args.get('terrain')
+        actualMonth = request.args.get('actualMonth')
+        state_symbol = request.args.get('state_symbol')
+        city = request.args.get('city')
+        duration = request.args.get('duration')
     
     # Validate required parameters
     if not all([state, precip_str, year]):
@@ -245,16 +263,7 @@ def predict():
     except ValueError:
         return render_template('error.html', error="Invalid precipitation or year value")
 
-    month = request.args.get('month')
-    terrain = request.args.get('terrain')
-    actualMonth = request.args.get('actualMonth')
-    state_symbol = request.args.get('state_symbol')
-
     # Optional parameters
-    city = request.args.get('city')
-    duration = request.args.get('duration')
-    
-    # Validate duration
     if duration is not None:
         try:
             duration = float(duration)
@@ -334,6 +343,148 @@ def drought():
             
     except Exception as e:
         return render_template('error.html', error=str(e))
+
+# Add this new route after your existing routes
+
+# Results summary page showing both predictions
+@app.route('/summary_results', methods=['POST'])
+def summary_results():
+    try:
+        # Get form data
+        location = request.form.get('location')
+        date = request.form.get('date')
+        
+        # Validate required fields
+        if not all([location, date]):
+            return render_template('error.html', error="Please provide both location and date")
+        
+        # Process date
+        try:
+            year = date[:4]
+            formatted_date = datetime.strptime(date, '%Y-%m-%d').strftime('%d/%m/%y')
+            month_name = datetime.strptime(date, '%Y-%m-%d').strftime('%B')
+            month_num = datetime.strptime(date, '%Y-%m-%d').strftime('%m')
+        except ValueError:
+            return render_template('error.html', error="Invalid date format. Please use YYYY-MM-DD format")
+        
+        # Get state code and terrain
+        state_code = None
+        for code, details in STATE_MAPPING.items():
+            if details["full_name"].lower() == location.lower() or code.lower() == location.lower():
+                state_code = code
+                break
+        
+        if not state_code:
+            # Try to get location data from Bing Maps
+            url = 'http://dev.virtualearth.net/REST/v1/Locations?'
+            key = BING_API_KEY
+            cr = 'IN'
+            results = url + urllib.parse.urlencode(({'CountryRegion': cr, 'locality': location, 'key': key}))
+            response = requests.get(results)
+            parser = response.json()
+            
+            if parser['statusDescription'] == 'OK':
+                if 'adminDistrict' not in parser['resourceSets'][0]['resources'][0]['address']:
+                    return render_template('error.html', error="Location does not exist in India! Please try again!")
+                state = parser['resourceSets'][0]['resources'][0]['address']['adminDistrict']
+                
+                # Find state code from state name
+                for code, details in STATE_MAPPING.items():
+                    if details["full_name"].lower() == state.lower() or code.lower() == state.lower():
+                        state_code = code
+                        break
+            else:
+                return render_template('error.html', error="Could not retrieve location data. Please try again.")
+        
+        if not state_code:
+            return render_template('error.html', error="State not found in our database. Please try another location.")
+        
+        # Get state details
+        quarter, duration = get_month_details(month_num)
+        state_name, terrain = get_state_and_terrain(state_code)
+        
+        # Get flood prediction data
+        flood_precipitation = get_rainfall_data(state_code, quarter)
+        flood_severity = predict_flood_severity(state_name, flood_precipitation, terrain)
+        
+        # Get drought prediction data
+        drought_precipitation, drought_severity = predict_drought(location, year, month_name)
+        
+        # Create summary text based on severity
+        flood_severity_text = ""
+        flood_summary = ""
+        flood_severity_percentage = 0
+        
+        if flood_severity == 0:
+            flood_severity_text = "No Flood Risk"
+            flood_summary = "Based on our analysis, there are negligible chances of a flood occurring in your area."
+            flood_severity_percentage = 10
+        elif flood_severity == 1:
+            flood_severity_text = "Mild Flood Risk"
+            flood_summary = "There are mild chances of a flood occurring. Be careful while going outdoors."
+            flood_severity_percentage = 30
+        elif flood_severity == 2:
+            flood_severity_text = "Moderate Flood Risk"
+            flood_summary = "There are high chances of a flood occurring. Going outdoors is not advisable."
+            flood_severity_percentage = 50
+        elif flood_severity == 3:
+            flood_severity_text = "High Flood Risk"
+            flood_summary = "There are very high chances of a flood occurring. Prepare for heavy water logging."
+            flood_severity_percentage = 70
+        elif flood_severity == 4:
+            flood_severity_text = "Severe Flood Risk"
+            flood_summary = "There are extremely high chances of a flood occurring. Take quick action to protect yourself."
+            flood_severity_percentage = 85
+        elif flood_severity == 5:
+            flood_severity_text = "Extreme Flood Risk"
+            flood_summary = "There are incredibly high chances of a severe flood occurring. Prepare for a strong wave of destruction."
+            flood_severity_percentage = 100
+        
+        # Create drought summary text
+        drought_summary = ""
+        drought_severity_percentage = 0
+        
+        if drought_severity == "Insufficient Data":
+            drought_summary = "We don't have enough historical data to make a reliable drought prediction for this location."
+            drought_severity_percentage = 0
+        elif drought_severity == "No Drought":
+            drought_summary = "Based on our analysis, there is no drought predicted for your location."
+            drought_severity_percentage = 10
+        elif drought_severity == "Mild Drought":
+            drought_summary = "A mild drought is predicted for your area. Basic water conservation is recommended."
+            drought_severity_percentage = 40
+        elif drought_severity == "Moderate Drought":
+            drought_summary = "A moderate drought is expected. Consider implementing water conservation measures."
+            drought_severity_percentage = 70
+        elif drought_severity == "Severe Drought":
+            drought_summary = "A severe drought is predicted. Immediate water conservation actions are needed."
+            drought_severity_percentage = 100
+        
+        return render_template(
+            'prediction_summary.html',
+            location=location,
+            month=month_name,
+            year=year,
+            date=formatted_date,
+            terrain=terrain,
+            flood_precipitation=round(flood_precipitation, 2),
+            flood_severity=flood_severity,
+            flood_severity_text=flood_severity_text,
+            flood_summary=flood_summary,
+            flood_severity_percentage=flood_severity_percentage,
+            drought_precipitation=round(drought_precipitation, 2) if drought_severity != "Insufficient Data" else 0,
+            drought_severity=drought_severity,
+            drought_summary=drought_summary,
+            drought_severity_percentage=drought_severity_percentage,
+            duration=duration,
+            actual_month=month_num,
+            state_code=state_code
+        )
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return render_template('error.html', error=f"An error occurred: {str(e)}")
 
 # Main entry point to run the Flask app
 if __name__ == "__main__":

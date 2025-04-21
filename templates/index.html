@@ -1,3 +1,4 @@
+-Action\templates\index.html -->
 <!DOCTYPE html>
 <html>
   <head>
@@ -15,20 +16,11 @@
       <source src="{{ url_for('static', filename='video/background-video.mp4') }}" type="video/mp4">
     </video>
     <div class="s002">
-      <form name="myForm" action="{{ url_for('login') }}" method="post" onsubmit="return validateForm()">
+      <form name="myForm" action="{{ url_for('summary_results') }}" method="post" onsubmit="return validateForm()">
         <fieldset>
-          <legend>PREDICT FLOOD OR DROUGHT</legend>
+          <legend>CLIMATE PREDICTION CENTER</legend>
         </fieldset>
         <div class="inner-form">
-          <!-- Prediction Type Selection -->
-          <div class="input-field third-wrap">
-            <label for="prediction_type">Choose Prediction Type:</label>
-            <select id="prediction_type" name="prediction_type" required>
-              <option value="flood">Flood Prediction</option>
-              <option value="drought">Drought Prediction</option>
-            </select>
-          </div>
-
           <!-- Location Input -->
           <div class="input-field first-wrap">
             <div class="icon-wrap">
@@ -51,7 +43,7 @@
 
           <!-- Submit Button -->
           <div class="input-field fifth-wrap">
-            <button class="btn-search" type="submit">SEARCH</button>
+            <button class="btn-search" type="submit">GET PREDICTIONS</button>
           </div>
         </div>
         <fieldset>

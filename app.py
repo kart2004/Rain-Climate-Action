@@ -311,7 +311,7 @@ def interim():
         actualMonth=actualMonth, 
         state_symbol=state_symbol,
         latitude=latitude,
-        longitude=longitude
+        longitude=lon
     ), code=307)
 
 # Flood prediction route
@@ -328,6 +328,7 @@ def predict():
         state_symbol = request.form.get('state_symbol')
         city = request.form.get('city')
         duration = request.form.get('duration')
+        from_summary = request.form.get('from_summary', 'false')  # Add this to track source
     else:
         state = request.args.get('state')
         precip_str = request.args.get('precipitation')
@@ -338,6 +339,7 @@ def predict():
         state_symbol = request.args.get('state_symbol')
         city = request.args.get('city')
         duration = request.args.get('duration')
+        from_summary = request.args.get('from_summary', 'false')
     
     # Validate required parameters
     if not all([state, precip_str, year]):
@@ -356,12 +358,18 @@ def predict():
         except ValueError:
             return render_template('error.html', error="Invalid duration value")
 
-    # Normalize precipitation over the duration
-    precipitation = normalize_precipitation(precipitation, duration)
+    # Only normalize precipitation if not coming from summary page
+    if from_summary != 'true':
+        # Normalize precipitation over the duration
+        precipitation = normalize_precipitation(precipitation, duration)
 
     # For years <= 2015, use historical data
     if year <= 2015:
-        precipitation, severity = get_historical_data(state, year, month, terrain)
+        historical_precip, severity = get_historical_data(state, year, month, terrain)
+        
+        # Only use historical data if not coming from summary
+        if from_summary != 'true':
+            precipitation = historical_precip
 
         return render_template(
             'flood_predict.html', 
@@ -377,8 +385,10 @@ def predict():
         )
     # For years > 2015, predict using model
     else:
-        # Get rainfall data
-        precipitation = get_rainfall_data(state_symbol, month)
+        # Only recalculate precipitation if not coming from summary
+        if from_summary != 'true':
+            # Get rainfall data
+            precipitation = get_rainfall_data(state_symbol, month)
 
         try:
             # Predict severity

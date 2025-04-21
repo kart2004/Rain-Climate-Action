@@ -1,60 +1,771 @@
--Action\templates\index.html -->
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="author" content="Techbusters">
-    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/main.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <title>Rain-Climate Action | Flood & Drought Predictor</title>
-  </head>
-  <body>
-    <video autoplay muted loop id="myVideo">
-      <source src="{{ url_for('static', filename='video/background-video.mp4') }}" type="video/mp4">
-    </video>
-    <div class="s002">
-      <form name="myForm" action="{{ url_for('summary_results') }}" method="post" onsubmit="return validateForm()">
-        <fieldset>
-          <legend>CLIMATE PREDICTION CENTER</legend>
-        </fieldset>
-        <div class="inner-form">
-          <!-- Location Input -->
-          <div class="input-field first-wrap">
-            <div class="icon-wrap">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"></path>
-              </svg>
-            </div>
-            <input id="search" type="text" placeholder="Enter city" name="location" value="{{ request.form.location }}" required/>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="author" content="Techbusters">
+  <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/bootstrap.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/main.css') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <title>Rain-Climate Action | Flood & Drought Predictor</title>
+  
+  <style>
+    :root {
+      --primary-green: #2ecc71;
+      --secondary-green: #27ae60;
+      --dark-green: #1e8449;
+      --light-green: #a9dfbf;
+      --very-light-green: #eafaf1;
+      --gradient-green: linear-gradient(135deg, #2ecc71, #1e8449);
+    }
+    
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow-x: hidden;
+      font-family: 'Poppins', sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    
+    #myVideo {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      min-width: 100%;
+      min-height: 100%;
+      opacity: 0.15;
+      z-index: -2;
+    }
+    
+    .bg-pattern {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(var(--light-green) 1px, transparent 1px),
+        radial-gradient(var(--light-green) 1px, transparent 1px);
+      background-size: 40px 40px;
+      background-position: 0 0, 20px 20px;
+      opacity: 0.4;
+      z-index: -1;
+    }
+    
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(233, 247, 239, 0.9) 100%);
+      z-index: -1;
+    }
+    
+    .app-container {
+      display: flex;
+      min-height: 100vh;
+      width: 100%;
+    }
+    
+    .side-panel {
+      width: 40%;
+      background: var(--gradient-green);
+      padding: 60px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      color: white;
+      box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+    }
+    
+    .side-panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("{{ url_for('static', filename='images/wave-pattern.png') }}");
+      background-size: cover;
+      opacity: 0.1;
+      z-index: 0;
+    }
+    
+    .side-panel-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .app-logo {
+      margin-bottom: 30px;
+      font-size: 28px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+    }
+    
+    .app-logo svg {
+      margin-right: 15px;
+    }
+    
+    .side-panel h1 {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      line-height: 1.2;
+    }
+    
+    .side-panel p {
+      font-size: 18px;
+      margin-bottom: 30px;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+    
+    .stats-container {
+      display: flex;
+      margin-top: 40px;
+      margin-bottom: 40px;
+    }
+    
+    .stat-item {
+      flex: 1;
+      padding: 20px;
+      border-right: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .stat-item:last-child {
+      border-right: none;
+    }
+    
+    .stat-number {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    
+    .main-panel {
+      width: 60%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+    
+    .prediction-card {
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+      padding: 40px;
+      width: 100%;
+      max-width: 600px;
+      transition: all 0.5s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .prediction-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.15);
+    }
+    
+    .prediction-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: var(--gradient-green);
+    }
+    
+    .glow-effect {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: radial-gradient(var(--light-green), transparent 70%);
+      opacity: 0.6;
+      filter: blur(20px);
+      z-index: 0;
+      transition: all 0.5s ease;
+    }
+    
+    .glow-1 {
+      top: -75px;
+      right: -75px;
+    }
+    
+    .glow-2 {
+      bottom: -75px;
+      left: -75px;
+    }
+    
+    .prediction-card:hover .glow-1 {
+      transform: scale(1.2);
+    }
+    
+    .prediction-card:hover .glow-2 {
+      transform: scale(1.2);
+    }
+    
+    legend {
+      text-align: center;
+      font-size: 32px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 30px;
+      position: relative;
+      padding-bottom: 15px;
+      z-index: 1;
+    }
+    
+    legend::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 4px;
+      background: var(--gradient-green);
+      border-radius: 2px;
+    }
+    
+    .inner-form {
+      margin-top: 30px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .input-field {
+      position: relative;
+      margin-bottom: 25px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+      transition: all 0.4s ease;
+      overflow: hidden;
+    }
+    
+    .input-field:hover {
+      box-shadow: 0 10px 30px rgba(46, 204, 113, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .input-field::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 5px;
+      background: var(--gradient-green);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    
+    .input-field:hover::before {
+      opacity: 1;
+    }
+    
+    .input-field input {
+      width: 100%;
+      padding: 22px 20px 22px 60px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+      background-color: #fff;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    
+    .input-field input:focus {
+      outline: none;
+      border-color: var(--primary-green);
+      box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.2);
+    }
+    
+    .icon-wrap {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+    }
+    
+    .icon-wrap svg {
+      fill: var(--primary-green);
+      width: 24px;
+      height: 24px;
+      transition: all 0.3s ease;
+    }
+    
+    .input-field:hover .icon-wrap svg {
+      transform: scale(1.1);
+    }
+    
+    .btn-search {
+      width: 100%;
+      background: var(--gradient-green);
+      color: white;
+      border: none;
+      padding: 22px;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      box-shadow: 0 10px 20px rgba(46, 204, 113, 0.3);
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    
+    .btn-search::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: all 0.6s ease;
+      z-index: -1;
+    }
+    
+    .btn-search:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(46, 204, 113, 0.4);
+    }
+    
+    .btn-search:hover::before {
+      left: 100%;
+    }
+    
+    #conditions {
+      text-align: center;
+      margin-top: 30px;
+      color: #666;
+      font-size: 15px;
+      font-weight: 500;
+      background-color: var(--very-light-green);
+      padding: 15px;
+      border-radius: 10px;
+      border-left: 4px solid var(--primary-green);
+      position: relative;
+      z-index: 1;
+      transition: all 0.3s ease;
+    }
+    
+    #conditions:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(46, 204, 113, 0.1);
+    }
+    
+    .features-section {
+      margin-top: 40px;
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .feature-box {
+      flex: 1;
+      background-color: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 0 10px;
+      text-align: center;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .feature-box::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--gradient-green);
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 0.4s ease;
+    }
+    
+    .feature-box:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    }
+    
+    .feature-box:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+    
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      background-color: var(--very-light-green);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 15px;
+      transition: all 0.4s ease;
+    }
+    
+    .feature-box:hover .feature-icon {
+      transform: scale(1.1);
+      background-color: var(--light-green);
+    }
+    
+    .feature-icon svg {
+      transition: all 0.4s ease;
+    }
+    
+    .feature-box:hover .feature-icon svg {
+      transform: rotateY(180deg);
+    }
+    
+    .feature-title {
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #333;
+      position: relative;
+      display: inline-block;
+    }
+    
+    .feature-title::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background-color: var(--primary-green);
+      transition: all 0.4s ease;
+    }
+    
+    .feature-box:hover .feature-title::after {
+      width: 100%;
+    }
+    
+    .feature-box p {
+      color: #666;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    
+    .feature-box:hover p {
+      color: #333;
+    }
+    
+    .title-accent {
+      color: var(--primary-green);
+      position: relative;
+      display: inline-block;
+      z-index: 1;
+    }
+    
+    .title-accent::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background-color: var(--light-green);
+      z-index: -1;
+      transform: skewX(-10deg);
+    }
+    
+    .floating-element {
+      position: absolute;
+      z-index: 0;
+      opacity: 0.5;
+      filter: blur(1px);
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .float-1 {
+      top: 20%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+    
+    .float-2 {
+      top: 60%;
+      right: 5%;
+      animation-delay: 1s;
+    }
+    
+    .float-3 {
+      bottom: 15%;
+      left: 15%;
+      animation-delay: 2s;
+    }
+    
+    @keyframes float {
+      0% {
+        transform: translateY(0) rotate(0deg);
+      }
+      50% {
+        transform: translateY(-20px) rotate(5deg);
+      }
+      100% {
+        transform: translateY(0) rotate(0deg);
+      }
+    }
+    
+    @media screen and (max-width: 1200px) {
+      .app-container {
+        flex-direction: column;
+      }
+      
+      .side-panel, .main-panel {
+        width: 100%;
+      }
+      
+      .side-panel {
+        padding: 60px 40px;
+      }
+      
+      .stats-container {
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+      
+      .side-panel h1 {
+        font-size: 36px;
+      }
+    }
+    
+    @media screen and (max-width: 768px) {
+      .features-section {
+        flex-direction: column;
+      }
+      
+      .feature-box {
+        margin: 10px 0;
+      }
+      
+      .side-panel {
+        padding: 40px 20px;
+      }
+      
+      .stat-number {
+        font-size: 28px;
+      }
+      
+      .prediction-card {
+        padding: 30px 20px;
+      }
+      
+      legend {
+        font-size: 28px;
+      }
+    }
+    
+    .animate-on-scroll {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s ease;
+    }
+    
+    .animate-on-scroll.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <video autoplay muted loop id="myVideo">
+    <source src="{{ url_for('static', filename='video/background-video.mp4') }}" type="video/mp4">
+  </video>
+  <div class="overlay"></div>
+  <div class="bg-pattern"></div>
+  
+  <!-- Floating Elements -->
+  <svg class="floating-element float-1" width="50" height="50" viewBox="0 0 24 24" fill="rgba(46, 204, 113, 0.3)">
+    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+  </svg>
+  
+  <svg class="floating-element float-2" width="60" height="60" viewBox="0 0 24 24" fill="rgba(46, 204, 113, 0.3)">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+  </svg>
+  
+  <svg class="floating-element float-3" width="45" height="45" viewBox="0 0 24 24" fill="rgba(46, 204, 113, 0.3)">
+    <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+  </svg>
+  
+  <div class="app-container">
+    <!-- Left Side Panel with Info -->
+    <div class="side-panel">
+      <div class="side-panel-content">
+        <div class="app-logo animate__animated animate__fadeIn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="white">
+            <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
+          </svg>
+          RAIN-CLIMATE ACTION
+        </div>
+        
+        <h1 class="animate__animated animate__fadeInUp">Predict Climate Events Before They Happen</h1>
+        <p class="animate__animated animate__fadeInUp animate__delay-1s">Our advanced AI-powered platform helps you forecast potential flood and drought events in your area, providing critical information to help you prepare and stay safe.</p>
+        
+        <div class="stats-container animate__animated animate__fadeInUp animate__delay-2s">
+          <div class="stat-item">
+            <div class="stat-number">95%</div>
+            <div class="stat-label">Accuracy</div>
           </div>
-
-          <!-- Date Input -->
-          <div class="input-field second-wrap">
-            <div class="icon-wrap">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"></path>
-              </svg>
-            </div>
-            <input class="datepicker" id="depart" type="text" placeholder="Pick a date after 1980" name="date" value="{{ request.form.date }}" required/>
+          <div class="stat-item">
+            <div class="stat-number">500+</div>
+            <div class="stat-label">Cities Covered</div>
           </div>
-
-          <!-- Submit Button -->
-          <div class="input-field fifth-wrap">
-            <button class="btn-search" type="submit">GET PREDICTIONS</button>
+          <div class="stat-item">
+            <div class="stat-number">40+</div>
+            <div class="stat-label">Years of Data</div>
           </div>
         </div>
-        <fieldset>
-          <h3 id="conditions">Please enter a city and pick a date after the year 1980!</h3>
-        </fieldset>
-      </form>
+        
+        <p class="animate__animated animate__fadeInUp animate__delay-3s">Simply enter your location and a date to get instant predictions on potential climate events that could affect your area.</p>
+      </div>
     </div>
+    
+    <!-- Right side with prediction form -->
+    <div class="main-panel">
+      <div class="prediction-card animate__animated animate__fadeIn animate__delay-1s">
+        <div class="glow-effect glow-1"></div>
+        <div class="glow-effect glow-2"></div>
+        
+        <form name="myForm" action="{{ url_for('summary_results') }}" method="post" onsubmit="return validateForm()">
+          <fieldset>
+            <legend>CLIMATE <span class="title-accent">PREDICTION</span> CENTER</legend>
+          </fieldset>
+          
+          <div class="inner-form">
+            <!-- Location Input -->
+            <div class="input-field first-wrap animate-on-scroll">
+              <div class="icon-wrap">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"></path>
+                </svg>
+              </div>
+              <input id="search" type="text" placeholder="Enter city or state in India" name="location" value="{{ request.form.location }}" required/>
+            </div>
 
-    <script type="text/javascript" src="{{ url_for('static', filename='choices.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='flatpickr.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='jquery-3.3.1.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='main5.js') }}"></script>
-  </body>
+            <!-- Date Input -->
+            <div class="input-field second-wrap animate-on-scroll">
+              <div class="icon-wrap">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                  <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"></path>
+                </svg>
+              </div>
+              <input class="datepicker" id="depart" type="text" placeholder="Pick a date after 1980" name="date" value="{{ request.form.date }}" required/>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="input-field fifth-wrap animate-on-scroll">
+              <button class="btn-search" type="submit">GET PREDICTIONS</button>
+            </div>
+          </div>
+          
+          <div id="conditions" class="animate-on-scroll">
+            Please enter a city in India and pick a date after the year 1980
+          </div>
+          
+          <div class="features-section">
+            <div class="feature-box animate-on-scroll">
+              <div class="feature-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="#2ecc71">
+                  <path d="M4 18h16v2H4zm0-5h16v2H4zm0-5h16v2H4zm0-5h16v2H4z"/>
+                </svg>
+              </div>
+              <h4 class="feature-title">Flood Risk</h4>
+              <p>Check potential flooding based on historical data and advanced AI models</p>
+            </div>
+            
+            <div class="feature-box animate-on-scroll">
+              <div class="feature-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="#2ecc71">
+                  <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+                </svg>
+              </div>
+              <h4 class="feature-title">Drought Risk</h4>
+              <p>Assess potential drought conditions with precise precipitation analysis</p>
+            </div>
+            
+            <div class="feature-box animate-on-scroll">
+              <div class="feature-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="#2ecc71">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+              </div>
+              <h4 class="feature-title">Safety Tips</h4>
+              <p>Get personalized precautions and advice based on climate predictions</p>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="{{ url_for('static', filename='choices.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='flatpickr.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='jquery-3.3.1.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='main5.js') }}"></script>
+  
+  <script>
+    // Animation for elements when scrolling
+    document.addEventListener('DOMContentLoaded', function() {
+      const animatedElements = document.querySelectorAll('.animate-on-scroll');
+      
+      // Immediately show elements that are in view on load
+      animatedElements.forEach(element => {
+        element.classList.add('show');
+      });
+      
+      // Add hover interactions for cards
+      const predictionCard = document.querySelector('.prediction-card');
+      
+      predictionCard.addEventListener('mousemove', function(e) {
+        const rect = this.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const angleX = (y - centerY) / 30;
+        const angleY = (centerX - x) / 30;
+        
+        this.style.transform = `perspective(1000px) rotateX(${angleX}deg) rotateY(${angleY}deg) translateY(-5px)`;
+      });
+      
+      predictionCard.addEventListener('mouseleave', function() {
+        this.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(-5px)';
+      });
+    });
+  </script>
+</body>
 </html>

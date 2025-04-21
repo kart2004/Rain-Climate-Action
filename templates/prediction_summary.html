@@ -62,6 +62,10 @@
             background: linear-gradient(to right, #ff9966, #ff5e62);
         }
         
+        .landslide-header {
+            background: linear-gradient(to right, #8B4513, #D2691E, #A0522D);
+        }
+        
         .card-body {
             padding: 30px;
         }
@@ -90,6 +94,12 @@
             border-color: #ff5e62;
         }
         
+        .landslide-btn:hover {
+            background-color: #8B4513;
+            color: white;
+            border-color: #8B4513;
+        }
+        
         .severity-indicator {
             display: inline-block;
             width: 100%;
@@ -112,6 +122,9 @@
         .drought-bar {
             background: linear-gradient(to right, #f5b041, #ff5e62);
         }
+        .landslide-bar {
+            background: linear-gradient(to right, #8B4513, #CD853F, #A0522D);
+        }
         
         .location-info {
             margin-bottom: 15px;
@@ -122,6 +135,31 @@
         .back-home {
             margin-top: 30px;
             text-align: center;
+        }
+        
+        .landslide-status {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .status-expected {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .status-not-expected {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        /* Responsive adjustments for the new 3-card layout */
+        @media (max-width: 991px) {
+            .prediction-card {
+                margin-bottom: 20px;
+            }
         }
     </style>
 </head>
@@ -147,7 +185,7 @@
         
         <div class="row">
             <!-- Flood Prediction Card -->
-            <div class="col-md-6">
+            <div class="col-lg-4 col-md-6">
                 <div class="prediction-card">
                     <div class="card-header flood-header">
                         <h3>Flood Prediction</h3>
@@ -185,7 +223,7 @@
             </div>
             
             <!-- Drought Prediction Card -->
-            <div class="col-md-6">
+            <div class="col-lg-4 col-md-6">
                 <div class="prediction-card">
                     <div class="card-header drought-header">
                         <h3>Drought Prediction</h3>
@@ -205,6 +243,33 @@
                         <p>{{ drought_summary }}</p>
                         
                         <a href="{{ url_for('drought', location=location, date=date, year=year) }}" class="details-btn drought-btn">View Detailed Drought Report</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Landslide Prediction Card -->
+            <div class="col-lg-4 col-md-6">
+                <div class="prediction-card">
+                    <div class="card-header landslide-header">
+                        <h3>Landslide Prediction</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="location-info">
+                            <p><strong>Location:</strong> {{ location }}</p>
+                            <p><strong>Date:</strong> {{ month }} {{ year }}</p>
+                            <p><strong>Precipitation:</strong> {{ flood_precipitation }} mm</p>
+                        </div>
+                        
+                        <h4>Landslide Risk  : {{landslide_prediction}}</h4>
+                        
+                        
+                        <p>{{ landslide_summary }}</p>
+                        <form action="{{url_for('landslide')}}" method="POST">
+                            <input type="hidden" name="location" value="{{location}}">
+                            <input type="hidden" name="precipitation" value="{{flood_precipitation}}">
+                            <input type="hidden" name="final_prediction" value="{{landslide_prediction}}">
+                            <button type="submit" class="details-btn landslide-btn"> View Detailed landslide report </button>
+                        </form>
                     </div>
                 </div>
             </div>

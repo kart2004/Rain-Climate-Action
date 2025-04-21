@@ -23,6 +23,8 @@ from drought.drought import (
     predict_drought
 )
 
+from landslide.model import predict_landslide
+
 # Import configuration
 from flood.config import STATE_MAPPING, BING_API_KEY, OPENWEATHER_API_KEY
 
@@ -355,6 +357,25 @@ def drought():
         return render_template('error.html', error=str(e))
 
 # Add this new route after your existing routes
+@app.route('/landslide',methods=['GET','POST'])
+def landslide():
+    if request.method=='POST':
+        location=request.form.get('location')
+        rainfall=request.form.get('precipitation')
+        final_prediction=request.form.get('final_prediction')
+    else:
+        location=request.args.get('location')
+        rainfall=request.args.get('precipitation')
+        final_prediction=request.args.get('final_prediction')
+    
+    if not all([location, rainfall,final_prediction]):
+        return render_template('error.html', error="Missing required parameters from initial form")
+    
+    # print(f'Recevied {location} ,{rainfall} and {final_prediction}')
+    try:
+        return render_template('landslide_predict.html',location=location,final_prediction=final_prediction,precipitation=rainfall)
+    except Exception as e:
+        return render_template('error.html',error=str(e))   
 
 # Results summary page showing both predictions
 @app.route('/summary_results', methods=['POST'])
@@ -470,6 +491,25 @@ def summary_results():
             drought_summary = "A severe drought is predicted. Immediate water conservation actions are needed."
             drought_severity_percentage = 100
         
+
+        landslide_summary=""
+        landslide_probability=predict_landslide(flood_precipitation,location)
+        final_prediction=""
+        print(f'Probability is {landslide_probability}')
+        if(landslide_probability>0.8):
+            final_prediction="Landslide risk exist"
+            landslide_summary="Based on our analysis your area is under threat of a landslide , evacuative measures are suggested"
+        elif(landslide_probability>0.1 and landslide_probability<0.3):
+            final_prediction="No landslide"
+            landslide_summary="Based on our analysis there is no landslide risk for your area , you can relax and enjoy the weather"
+        elif(landslide_probability>=0.3 and landslide_probability<0.5):
+            final_prediction="Mild risk"
+            landslide_summary="Based on our analysis there is a mild risk of landslide , stay updated with the latest news"
+        elif(landslide_probability>=0.5 and landslide_probability < 0.8):
+            final_prediction="Moderate risk"
+            landslide_summary="Based on our analysis there is a moderate risk of landslide , be prepared "
+        
+
         return render_template(
             'prediction_summary.html',
             location=location,
@@ -488,7 +528,10 @@ def summary_results():
             drought_severity_percentage=drought_severity_percentage,
             duration=duration,
             actual_month=month_num,
-            state_code=state_code
+            state_code=state_code,
+            landslide_probability=landslide_probability,
+            landslide_prediction=final_prediction,
+            landslide_summary=landslide_summary
         )
         
     except Exception as e:

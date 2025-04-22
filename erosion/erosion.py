@@ -1,43 +1,40 @@
-def calculate_r_factor(precipitation_mm, rainfall_energy, rain_days):
-    """
-    Calculate the R factor for a given region.
+import csv
+
+# Function to read the CSV and load the data into a dictionary
+def load_state_data(csv_filename):
+    state_data = {}
+    with open(csv_filename, mode="r") as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            state = row['State']
+            AAR = int(row['AAR'])
+            AER = float(row['AER'])
+            state_data[state] = {"AAR": AAR, "AER": AER}
+    return state_data
+
+# Function to calculate the R Factor based on state and rainfall
+def calculate_r_factor(state, rainfall_mm, csv_filename="data/erosion_data.csv"):
+    # Load the state data from the CSV file
+    state_data = load_state_data(csv_filename)
     
-    :param precipitation_mm: Annual precipitation in millimeters (mm)
-    :param rainfall_energy: Rainfall energy in MJ·mm/ha·h (example: 75 for temperate regions)
-    :param rain_days: Number of rainy days per year
-    :return: R factor (MJ·mm/(ha·h·yr))
-    """
-    # Calculate the R factor using the formula
-    r_factor = (rainfall_energy * precipitation_mm) / rain_days
-    return r_factor
-
-def predict_erosion(r_factor):
-    """
-    Predict the erosion risk based on the R factor.
+    # Check if the state is valid
+    if state not in state_data:
+        return f"State '{state}' not found. Please check the state name."
     
-    :param r_factor: The calculated R factor
-    :return: Erosion risk category (Low, Moderate, High, Severe)
-    """
-    if r_factor < 200:
-        return "Low Erosion Risk"
-    elif 200 <= r_factor < 500:
-        return "Moderate Erosion Risk"
-    elif 500 <= r_factor < 1000:
-        return "High Erosion Risk"
-    else:
-        return "Severe Erosion Risk"
-
-# Example inputs
-precipitation_mm = 1000  # Example annual precipitation in mm
-rainfall_energy = 75     # Example rainfall energy in MJ·mm/ha·h (common for temperate regions)
-rain_days = 150          # Example number of rain days per year
-
-# Calculate the R factor
-r_factor = calculate_r_factor(precipitation_mm, rainfall_energy, rain_days)
-
-# Predict the erosion risk
-erosion_risk = predict_erosion(r_factor)
-
-# Print results
-print(f"Calculated R factor: {r_factor:.2f}")
-print(f"Erosion Risk: {erosion_risk}")
+    # Get the AAR and AER for the state
+    state_info = state_data[state]
+    AAR = state_info["AAR"]
+    AER = state_info["AER"]
+    
+    # Calculate the energy of the rainfall (E)
+    E = rainfall_mm * 0.05  # Simple estimate for energy calculation
+    
+    # Calculate the R factor for the given rainfall
+    R_factor = (rainfall_mm * E) / AAR
+    
+    return {
+        "State": state,
+        "AAR": AAR,
+        "AER": AER,
+        "R Factor": R_factor
+    }

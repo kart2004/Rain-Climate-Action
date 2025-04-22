@@ -6,6 +6,7 @@ import numpy as np
 import tensorflow as tf
 import sys
 import os
+from erosion.erosion import calculate_r_factor
 
 # Import flood-related functionality
 from flood.flood import (
@@ -373,6 +374,8 @@ def predict():
         if from_summary != 'true':
             precipitation = historical_precip
 
+        result = calculate_r_factor(state, round(precipitation, 2))
+
         return render_template(
             'flood_predict.html', 
             severity=str(severity), 
@@ -383,7 +386,9 @@ def predict():
             precipitation=round(precipitation, 2), 
             terrain=terrain, 
             year=year,
-            rf = int(precipitation / 2)
+            rf = result['R Factor'],
+            aar = result['AAR'],
+            aer = result['AER']
         )
     # For years > 2015, predict using model
     else:
@@ -395,7 +400,8 @@ def predict():
         try:
             # Predict severity
             severity = predict_flood_severity(state, precipitation, terrain)
-
+            # print(f"State: {state}, Precipitation: {precipitation}, Severity: {severity}")
+            # result = calculate_r_factor(state, round(precipitation, 2))
             return render_template(
                 'flood_predict.html', 
                 severity=str(severity), 
@@ -406,7 +412,7 @@ def predict():
                 precipitation=round(precipitation, 2), 
                 terrain=terrain, 
                 year=year,
-                rf = precipitation/2
+                rf = round(precipitation, 2)
             )
         except Exception as e:
             return render_template('error.html', error=str(e), city=city, state=state)

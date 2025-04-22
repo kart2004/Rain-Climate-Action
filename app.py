@@ -571,12 +571,12 @@ def summary_results():
             state_code=city_to_state.get(location)
             state_name,terrain=get_state_and_terrain(state_code)
             if(state_name.title() in states):
-                location=state_name.strip().title()
+                landslide_location=state_name.strip().title()
             else:
                 for state in states:
                     if state in state_name.strip().title():
-                        location=state
-        landslide_probability=predict_landslide(flood_precipitation,location.strip())
+                        landslide_location=state
+        landslide_probability=predict_landslide(flood_precipitation,landslide_location.strip())
         final_prediction=""
         # print(f'Location is {location}')
         # print(f'Probability is {landslide_probability}')

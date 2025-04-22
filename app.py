@@ -566,37 +566,61 @@ def summary_results():
             drought_severity_percentage = 100
         
 
-        landslide_summary=""
+        landslide_summary = ""
+        # Initialize landslide_location with the original location to prevent UnboundLocalError
+        landslide_location = location  
+
         if location not in states:
-            state_code=city_to_state.get(location)
-            state_name,terrain=get_state_and_terrain(state_code)
-            if(state_name.title() in states):
-                landslide_location=state_name.strip().title()
+            state_code = city_to_state.get(location)
+            if state_code:  # Check if state_code exists
+                state_name, terrain = get_state_and_terrain(state_code)
+                if state_name.title() in states:
+                    landslide_location = state_name.strip().title()
+                else:
+                    # Search for partial matches
+                    found_match = False
+                    for state in states:
+                        if state in state_name.strip().title():
+                            landslide_location = state
+                            found_match = True
+                            break  # Exit loop once found
+                    
+                    # If no match found, keep the original value
+                    if not found_match:
+                        landslide_location = location
             else:
-                for state in states:
-                    if state in state_name.strip().title():
-                        landslide_location=state
-        landslide_probability=predict_landslide(flood_precipitation,landslide_location.strip())
-        final_prediction=""
-        # print(f'Location is {location}')
-        # print(f'Probability is {landslide_probability}')
-        if isinstance(landslide_probability,tuple):
-            landslide_probability=0
-        if(landslide_probability>=0.7):
-            final_prediction="Landslide risk exist"
-            landslide_summary="Based on our analysis your area is under threat of a severe landslide , evacuative measures are suggested"
-        elif(landslide_probability>0 and landslide_probability<0.3):
-            final_prediction="No landslide"
-            landslide_summary="Based on our analysis there is no landslide risk for your area , you can relax and enjoy the weather"
-        elif(landslide_probability>=0.3 and landslide_probability<0.5):
-            final_prediction="Mild risk"
-            landslide_summary="Based on our analysis there is a mild risk of landslide , stay updated with the latest news"
-        elif(landslide_probability>=0.5 and landslide_probability < 0.7):
-            final_prediction="Moderate risk"
-            landslide_summary="Based on our analysis there is a moderate risk of landslide , be prepared "
-        else:
-            final_prediction="Insufficient data"
-            landslide_summary="Due to insufficient data, analysis cannot be made in your region"
+                # If city not found in mapping, keep original location
+                landslide_location = location
+
+        # Now landslide_location is guaranteed to be defined
+        try:
+            landslide_probability = predict_landslide(flood_precipitation, landslide_location.strip())
+            
+            # Handle case where landslide_probability is a tuple instead of a number
+            if isinstance(landslide_probability, tuple):
+                landslide_probability = 0
+                
+            if landslide_probability >= 0.7:
+                final_prediction = "Landslide risk exist"
+                landslide_summary = "Based on our analysis your area is under threat of a severe landslide, evacuative measures are suggested"
+            elif landslide_probability > 0 and landslide_probability < 0.3:
+                final_prediction = "No landslide"
+                landslide_summary = "Based on our analysis there is no landslide risk for your area, you can relax and enjoy the weather"
+            elif landslide_probability >= 0.3 and landslide_probability < 0.5:
+                final_prediction = "Mild risk"
+                landslide_summary = "Based on our analysis there is a mild risk of landslide, stay updated with the latest news"
+            elif landslide_probability >= 0.5 and landslide_probability < 0.7:
+                final_prediction = "Moderate risk"
+                landslide_summary = "Based on our analysis there is a moderate risk of landslide, be prepared"
+            else:
+                final_prediction = "Insufficient data"
+                landslide_summary = "Due to insufficient data, analysis cannot be made in your region"
+        except Exception as e:
+            # Gracefully handle errors in landslide prediction
+            print(f"Error in landslide prediction: {str(e)}")
+            final_prediction = "Prediction unavailable"
+            landslide_summary = "Unable to calculate landslide risk due to a technical issue"
+            landslide_probability = 0
 
         return render_template(
             'prediction_summary.html',

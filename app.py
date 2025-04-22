@@ -413,29 +413,29 @@ def predict():
 # Route for Drought Prediction page
 @app.route('/drought')
 def drought():
-    try:
-        # Get values from request args
-        location = request.args.get('location')
-        date = request.args.get('date')
-        precipitation = float(request.args.get('precipitation', 0.0))
-        
-        # Determine drought severity
-        if precipitation < 50:
-            severity = "High Risk of Drought"
-            summary = "Warning: High risk of drought detected. Immediate water conservation measures required."
-        else:
-            severity = "No Drought Risk"
-            summary = "No significant drought risk detected. Continue normal water usage with conservation practices."
-            
-        return render_template('drought_predict.html',
-                             location=location,
-                             date=date,
-                             precipitation=precipitation,
-                             severity=severity,
-                             summary=summary)
-                             
-    except Exception as e:
-        return render_template('error.html', error=f"Sorry, something went wrong: {str(e)}")
+    location = request.args.get("location")
+    year = request.args.get("year")
+    date = request.args.get("date")
+    precipitation = float(request.args.get("precipitation", 0))
+
+    high_risk = precipitation < 50
+    if high_risk:
+        message = "High risk of drought"
+        bg_image = "images/drought_predict.jpg"
+    else:
+        message = "Hooray!! There is a low risk of drought"
+        bg_image = "images/no-drought.jpeg"
+
+    return render_template("drought_predict.html",
+                           location=location,
+                           year=year,
+                           date=date,
+                           precipitation=precipitation,
+                           message=message,
+                           high_risk=high_risk,
+                           bg_image=bg_image)
+
+
 
 # Add this new route after your existing routes
 @app.route('/landslide',methods=['GET','POST'])

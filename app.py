@@ -6,8 +6,6 @@ import numpy as np
 import tensorflow as tf
 import sys
 import os
-from erosion.erosion import calculate_r_factor
-
 # Import flood-related functionality
 from flood.flood import (
     get_state_and_terrain, 
@@ -24,8 +22,7 @@ from drought.drought import (
     predict_drought
 )
 
-from landslide.model import predict_landslide
-
+from landslide.model import predict_landslide,states,city_to_state
 # Import configuration
 from flood.config import STATE_MAPPING, BING_API_KEY, OPENWEATHER_API_KEY
 
@@ -33,6 +30,7 @@ from flood.config import STATE_MAPPING, BING_API_KEY, OPENWEATHER_API_KEY
 tf.compat.v1.enable_eager_execution()
 
 # Initialize Flask app
+
 app = Flask(__name__)
 app.secret_key = 'my secret and not your secret'
 
@@ -374,8 +372,6 @@ def predict():
         if from_summary != 'true':
             precipitation = historical_precip
 
-        result = calculate_r_factor(state, round(precipitation, 2))
-
         return render_template(
             'flood_predict.html', 
             severity=str(severity), 
@@ -386,9 +382,7 @@ def predict():
             precipitation=round(precipitation, 2), 
             terrain=terrain, 
             year=year,
-            rf = result['R Factor'],
-            aar = result['AAR'],
-            aer = result['AER']
+            rf = int(precipitation / 2)
         )
     # For years > 2015, predict using model
     else:
@@ -400,8 +394,7 @@ def predict():
         try:
             # Predict severity
             severity = predict_flood_severity(state, precipitation, terrain)
-            # print(f"State: {state}, Precipitation: {precipitation}, Severity: {severity}")
-            # result = calculate_r_factor(state, round(precipitation, 2))
+
             return render_template(
                 'flood_predict.html', 
                 severity=str(severity), 
@@ -412,7 +405,7 @@ def predict():
                 precipitation=round(precipitation, 2), 
                 terrain=terrain, 
                 year=year,
-                rf = round(precipitation, 2)
+                rf = precipitation/2
             )
         except Exception as e:
             return render_template('error.html', error=str(e), city=city, state=state)
@@ -574,21 +567,31 @@ def summary_results():
         
 
         landslide_summary=""
-        landslide_probability=predict_landslide(flood_precipitation,location)
+        if location not in states:
+            state_code=city_to_state.get(location)
+            state_name,terrain=get_state_and_terrain(state_code)
+            if(state_name.title() in states):
+                landslide_location=state_name.strip().title()
+            else:
+                for state in states:
+                    if state in state_name.strip().title():
+                        landslide_location=state
+        landslide_probability=predict_landslide(flood_precipitation,landslide_location.strip())
         final_prediction=""
-        #print(f'Probability is {landslide_probability}')
+        # print(f'Location is {location}')
+        # print(f'Probability is {landslide_probability}')
         if isinstance(landslide_probability,tuple):
             landslide_probability=0
-        if(landslide_probability>0.8):
+        if(landslide_probability>=0.7):
             final_prediction="Landslide risk exist"
-            landslide_summary="Based on our analysis your area is under threat of a landslide , evacuative measures are suggested"
-        elif(landslide_probability>0.1 and landslide_probability<0.3):
+            landslide_summary="Based on our analysis your area is under threat of a severe landslide , evacuative measures are suggested"
+        elif(landslide_probability>0 and landslide_probability<0.3):
             final_prediction="No landslide"
             landslide_summary="Based on our analysis there is no landslide risk for your area , you can relax and enjoy the weather"
         elif(landslide_probability>=0.3 and landslide_probability<0.5):
             final_prediction="Mild risk"
             landslide_summary="Based on our analysis there is a mild risk of landslide , stay updated with the latest news"
-        elif(landslide_probability>=0.5 and landslide_probability < 0.8):
+        elif(landslide_probability>=0.5 and landslide_probability < 0.7):
             final_prediction="Moderate risk"
             landslide_summary="Based on our analysis there is a moderate risk of landslide , be prepared "
         else:

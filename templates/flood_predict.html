@@ -26,6 +26,117 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/style.css') }}">
 
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Background and card styling */
+        body {
+            background: linear-gradient(135deg, #6c5ce7, #00b894); 
+            font-family: 'Arial', sans-serif;
+            padding: 30px 0;
+        }
+
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2d3436;
+            margin-bottom: 20px;
+        }
+
+        .btn-primary, .btn-secondary, .btn-success {
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background-color: #6c5ce7;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #5a4ec3;
+        }
+
+        .btn-secondary {
+            background-color: #fdcb6e;
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: #fabd4b;
+        }
+
+        .btn-success {
+            background-color: #00b894;
+            border: none;
+        }
+
+        .btn-success:hover {
+            background-color: #019c77;
+        }
+
+        .content-section {
+            margin-top: 40px;
+        }
+
+        .content-section p, .content-section ul {
+            font-size: 1rem;
+            color: #636e72;
+        }
+
+        .content-section ul {
+            padding-left: 20px;
+        }
+
+        .content-section h4 {
+            font-size: 1.5rem;
+            color: #2d3436;
+            margin-bottom: 20px;
+        }
+
+        .content-section .bg-light {
+            background-color: #f0f4f8;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        /* Fade-in animation for content visibility */
+        .fade-in {
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .transparent-dark {
+            background-color: rgba(0, 0, 0, 0.45);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+    </style>
 </head>
 <body>
     <div class="swiper-container">
@@ -40,55 +151,71 @@
                             <div class="col-12 col-lg-8 d-flex flex-column justify-content-center align-items-start">
                                 <header class="entry-header">
                                     <h1>
-                                        {% if severity == '0' %}
-                                            Hooray, no chances of floods here!
-                                        {% elif severity == '1' %}
-                                            Get your weather boots out!
-                                        {% elif severity == '2' %}
-                                            Looks like you are going to be working from home!
-                                        {% elif severity == '3' %}
-                                            Beware, heavy floods incoming!
-                                        {% elif severity == '4' %}
-                                            Brace yourself! Severe floods incoming!
-                                        {% elif severity == '5' %}
-                                            Act fast! You are in grave danger!
+                                        {% if severity == '0' %} Hooray, no chances of floods here!
+                                        {% elif severity == '1' %} Get your weather boots out!
+                                        {% elif severity == '2' %} Looks like you are going to be working from home!
+                                        {% elif severity == '3' %} Beware, heavy floods incoming!
+                                        {% elif severity == '4' %} Brace yourself! Severe floods incoming!
+                                        {% elif severity == '5' %} Act fast! You are in grave danger!
                                         {% endif %}
                                     </h1>
                                 </header>
 
                                 <div class="entry-content mt-4">
                                     <p>
-                                        {% if severity == '0' %}
-                                            Based on your location and the given date, there are negligible chances of a flood occurring! Sit back, relax, and enjoy your day!
-                                        {% elif severity == '1' %}
-                                            Based on your location and the given date, there are mild chances of a flood occurring! Be careful while going outdoors!
-                                        {% elif severity == '2' %}
-                                            Based on your location and the given date, there are high chances of a flood occurring! Going outdoors is not advisable!
-                                        {% elif severity == '3' %}
-                                            Based on your location and the given date, there are very high chances of a flood occurring! Prepare for heavy water logging!
-                                        {% elif severity == '4' %}
-                                            Based on your location and the given date, there are extremely high chances of a flood occurring! Take quick action and protect yourself!
-                                        {% elif severity == '5' %}
-                                            Based on your location and the given date, there are incredibly high chances of a severe flood occurring! Prepare yourself for a strong wave of destruction!
+                                        {% if severity == '0' %} Based on your location and the given date, there are negligible chances of a flood occurring! Sit back, relax, and enjoy your day!
+                                        {% elif severity == '1' %} Based on your location and the given date, there are mild chances of a flood occurring! Be careful while going outdoors!
+                                        {% elif severity == '2' %} Based on your location and the given date, there are high chances of a flood occurring! Going outdoors is not advisable!
+                                        {% elif severity == '3' %} Based on your location and the given date, there are very high chances of a flood occurring! Prepare for heavy water logging!
+                                        {% elif severity == '4' %} Based on your location and the given date, there are extremely high chances of a flood occurring! Take quick action and protect yourself!
+                                        {% elif severity == '5' %} Based on your location and the given date, there are incredibly high chances of a severe flood occurring! Prepare yourself for a strong wave of destruction!
                                         {% endif %}
                                     </p>
                                 </div>
-                                <header class="entry-content mt-6 fs-4">
-                                    <h2>
-                                        {% if rf <= 50 %}
-                                            <p>Hooray, no chances of erosion here!</p>
-                                        {% elif 50 < rf <= 100 %}
-                                            <p>Low chances of erosion. R-factor is {{ rf }}</p>
-                                        {% elif 100 < rf <= 250 %}
-                                            <p>Moderate erosion risk. Be cautious! R-factor is {{ rf }}</p>
-                                        {% elif 250 < rf <= 500 %}
-                                            <p>High erosion risk. Take precautions! R-factor is {{ rf }}</p>
-                                        {% else %}
-                                            <p>Severe erosion risk. Immediate action needed! R-factor is {{ rf }}</p>
-                                        {% endif %}
-
-                                    </h2>
-                                </header>
+                                
+                                <div class="d-flex flex-wrap justify-content-between align-items-start mt-5">
+                                    <!-- Left: Heading + Buttons -->
+                                    <div class="left-content" style="flex: 1; min-width: 300px; max-width: 40%;">
+                                        <h2 style="color: white; font-weight: bold;">Current R-Factor: <strong>{{ rf }}</strong></h2>
+                                        <p style="color: white;">This is the measure of the rainfall's potential to cause soil erosion in your area.</p>
+                                
+                                        <button class="btn btn-primary mt-3 me-2" id="showCalcBtn">How to Calculate R-Factor</button>
+                                        <button class="btn btn-success mt-3" id="learnMoreBtn">Learn More About R-Factor</button>
+                                    </div>
+                                
+                                    <!-- Right: Explanation/Calculation Box -->
+                                    <div class="right-box mt-3 mt-md-0" style="flex: 1; min-width: 400px; max-width: 58%;">
+                                        <!-- Calculation -->
+                                        <div id="rFactorCalc" class="fade-in transparent-dark mb-3" style="display: none;">
+                                            <h4>R-Factor Calculation</h4>
+                                            <p>The R-factor is calculated based on rainfall intensity and its erosion potential. Formula:</p>
+                                            <h5>R = P × I × C × K</h5>
+                                            <ul>
+                                                <li><strong>P</strong>: Precipitation (mm)</li>
+                                                <li><strong>I</strong>: Rainfall intensity</li>
+                                                <li><strong>C</strong>: Soil cover factor</li>
+                                                <li><strong>K</strong>: Erosion factor</li>
+                                            </ul>
+                                        </div>
+                                
+                                        <!-- Explanation -->
+                                        <div id="rFactorExplanation" class="fade-in transparent-dark mb-3" style="display: none;">
+                                            <h4>What is R-Factor?</h4>
+                                            <p>The <strong>R-Factor</strong> (Rainfall Erosivity Factor) measures how much rainfall contributes to soil erosion. It’s a key part of the Universal Soil Loss Equation (USLE) used in flood and erosion modeling.</p>
+                                        
+                                            <p><strong>Why it matters:</strong></p>
+                                            <ul>
+                                                <li>Helps assess erosion risk in agriculture and urban planning.</li>
+                                                <li>Supports flood prediction by identifying areas vulnerable to runoff.</li>
+                                                <li>Aids in designing protective measures like vegetation buffers or drainage systems.</li>
+                                            </ul>
+                                        
+                                            <p>Regions with higher R-Factors are more likely to face erosion, waterlogging, and potential flood damage—especially during heavy rains or monsoons.</p>
+                                        </div>
+                                        
+                                        
+                                    </div>
+                                </div>
 
                                 <footer class="entry-footer d-flex flex-wrap align-items-center mt-5">
                                     <a href="{{ url_for('index') }}" class="btn blue-border mr-2">Predict Again</a>
@@ -353,6 +480,24 @@
     <script type='text/javascript' src = "{{ url_for('static', filename = 'js/jquery.countTo.min.js') }}"></script>
     <script type='text/javascript' src = "{{ url_for('static', filename = 'js/jquery.barfiller.js') }}"></script>
     <script type='text/javascript' src = "{{ url_for('static', filename = 'js/custom.js') }}"></script>
+    <script>
+        const calcBox = document.getElementById('rFactorCalc');
+        const explBox = document.getElementById('rFactorExplanation');
+    
+        document.getElementById('showCalcBtn').addEventListener('click', () => {
+            const calcVisible = calcBox.style.display === 'block';
+            calcBox.style.display = calcVisible ? 'none' : 'block';
+            explBox.style.display = 'none';
+        });
+    
+        document.getElementById('learnMoreBtn').addEventListener('click', () => {
+            const explVisible = explBox.style.display === 'block';
+            explBox.style.display = explVisible ? 'none' : 'block';
+            calcBox.style.display = 'none';
+        });
+    </script>
+    
+    
 
 </body>
 </html>

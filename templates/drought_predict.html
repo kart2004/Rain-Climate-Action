@@ -1,73 +1,53 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Drought Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                        url('{{ url_for("static", filename="images/" + ("drought.jpeg" if precipitation < 50 else "no-drought.jpeg")) }}') no-repeat center center fixed;
+            background-size: cover;
+        }
+        .container {
+            padding: 40px;
+            max-width: 800px;
+            margin: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        ul {
+            list-style-type: square;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% if precipitation < 50 %}
+            <h1>⚠️ High Risk of Drought</h1>
+            <p>The predicted precipitation is <strong>{{ precipitation }} mm</strong>, indicating a high risk of drought in {{ location }} during {{ month }} {{ year }}.</p>
 
-{% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Drought Management Plan</h4>
-                </div>
-                <div class="card-body">
-                    {% if severity == "High Risk of Drought" %}
-                        <div class="mt-4">
-                            <h5>Short-term Measures</h5>
-                            <ul>
-                                <li>Implement strict water rationing</li>
-                                <li>Fix all leaks in water supply systems</li>
-                                <li>Reduce outdoor water usage</li>
-                                <li>Use water-efficient appliances</li>
-                                <li>Collect and store rainwater</li>
-                            </ul>
-                        </div>
-                        
-                        <div class="mt-4">
-                            <h5>Medium-term Strategies</h5>
-                            <ul>
-                                <li>Install water-saving devices</li>
-                                <li>Implement greywater recycling systems</li>
-                                <li>Develop drought-resistant landscaping</li>
-                                <li>Create community water conservation programs</li>
-                                <li>Educate public on water conservation</li>
-                            </ul>
-                        </div>
-                        
-                        <div class="mt-4">
-                            <h5>Long-term Solutions</h5>
-                            <ul>
-                                <li>Invest in water infrastructure</li>
-                                <li>Develop alternative water sources</li>
-                                <li>Implement sustainable agriculture practices</li>
-                                <li>Create water management policies</li>
-                                <li>Promote water-efficient technologies</li>
-                            </ul>
-                        </div>
-                    {% else %}
-                        <div class="mt-4">
-                            <h5>Water Conservation Tips</h5>
-                            <ul>
-                                <li>Regularly check for and fix leaks</li>
-                                <li>Use water-efficient appliances</li>
-                                <li>Practice rainwater harvesting</li>
-                                <li>Implement smart irrigation systems</li>
-                                <li>Educate community on water conservation</li>
-                            </ul>
-                        </div>
-                        
-                        <div class="mt-4">
-                            <h5>Sustainable Practices</h5>
-                            <ul>
-                                <li>Maintain water-efficient landscaping</li>
-                                <li>Use drought-resistant plants</li>
-                                <li>Implement water recycling systems</li>
-                                <li>Monitor water usage regularly</li>
-                                <li>Develop emergency water plans</li>
-                            </ul>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+            <h2>💡 Preventive Measures:</h2>
+            <ul>
+                <li>Promote water conservation through efficient irrigation techniques.</li>
+                <li>Encourage rainwater harvesting and groundwater recharge.</li>
+                <li>Support drought-resilient crops and farming practices.</li>
+                <li>Enhance weather monitoring and early warning systems.</li>
+                <li>Educate communities on sustainable water usage.</li>
+            </ul>
+        {% else %}
+            <h1>🌿 Hooray!! Low Risk of Drought</h1>
+            <p>The predicted precipitation is <strong>{{ precipitation }} mm</strong>, which indicates a low risk of drought in {{ location }} during {{ month }} {{ year }}.</p>
+        {% endif %}
     </div>
-</div>
-{% endblock %}
+</body>
+</html>

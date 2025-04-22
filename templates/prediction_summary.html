@@ -223,29 +223,30 @@
             </div>
             
             <!-- Drought Prediction Card -->
-            <div class="col-lg-4 col-md-6">
-                <div class="prediction-card">
-                    <div class="card-header drought-header">
-                        <h3>Drought Prediction</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="location-info">
-                            <p><strong>Location:</strong> {{ location }}</p>
-                            <p><strong>Date:</strong> {{ month }} {{ year }}</p>
-                            <p><strong>Precipitation:</strong> {{ drought_precipitation }} mm</p>
-                        </div>
-                        
-                        <h4>Drought Risk: {{ drought_severity }}</h4>
-                        <div class="severity-indicator">
-                            <div class="severity-bar drought-bar" style="width: {{ drought_severity_percentage }}%"></div>
-                        </div>
-                        
-                        <p>{{ drought_summary }}</p>
-                        
-                        <a href="{{ url_for('drought', location=location, date=date, year=year) }}" class="details-btn drought-btn">View Detailed Drought Report</a>
-                    </div>
-                </div>
+<div class="col-lg-4 col-md-6">
+    <div class="prediction-card">
+        <div class="card-header drought-header">
+            <h3>Drought Prediction</h3>
+        </div>
+        <div class="card-body">
+            <div class="location-info">
+                <p><strong>Location:</strong> {{ location }}</p>
+                <p><strong>Date:</strong> {{ month }} {{ year }}</p>
+                <p><strong>Precipitation:</strong> {{ drought_precipitation }} mm</p>
             </div>
+
+            <h4>Drought Risk: {{ drought_severity }}</h4>
+            <div class="severity-indicator">
+                <div class="severity-bar drought-bar" style="width: {{ drought_severity_percentage }}%"></div>
+            </div>
+
+            <p>{{ drought_summary }}</p>
+
+            <a href="{{ url_for('drought', location=location, date=date, year=year, precipitation=drought_precipitation) }}" class="details-btn drought-btn">View Detailed Drought Report</a>
+        </div>
+    </div>
+</div>
+
             
             <!-- Landslide Prediction Card -->
             <div class="col-lg-4 col-md-6">

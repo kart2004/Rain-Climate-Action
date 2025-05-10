@@ -411,29 +411,48 @@ def predict():
             return render_template('error.html', error=str(e), city=city, state=state)
 
 # Route for Drought Prediction page
-@app.route('/drought')
+from drought.drought import predict_drought
+
+@app.route('/drought', methods=['GET', 'POST'])
 def drought():
-    location = request.args.get("location")
-    year = request.args.get("year")
-    date = request.args.get("date")
-    precipitation = float(request.args.get("precipitation", 0))
+    if request.method == 'POST':
+        try:
+            date = request.form.get('date')
+            location = request.form.get('location')
+            year = request.form.get('year')
+            precipitation = float(request.form.get('precipitation'))
 
-    high_risk = precipitation < 50
-    if high_risk:
-        message = "High risk of drought"
-        bg_image = "images/drought_predict.jpg"
+            # Call simplified drought prediction logic
+            result = predict_drought(location, year, date.split("-")[1], precipitation)
+            anomaly = result.get("anomaly_detected", False)
+
+            return render_template('drought_predict.html', 
+                                   anomaly=anomaly,
+                                   location=location,
+                                   precipitation=precipitation,
+                                   date=date,
+                                   year=year)
+        except Exception as e:
+            return render_template('drought_predict.html', 
+                                   error=f"An error occurred: {str(e)}")
     else:
-        message = "Hooray!! There is a low risk of drought"
-        bg_image = "images/no-drought.jpeg"
+        # For GET requests, display the drought prediction page
+        location = request.args.get('location')
+        date = request.args.get('date')
+        year = request.args.get('year')
+        precipitation = float(request.args.get('precipitation', 0))  # Default to 0 if not present
 
-    return render_template("drought_predict.html",
-                           location=location,
-                           year=year,
-                           date=date,
-                           precipitation=precipitation,
-                           message=message,
-                           high_risk=high_risk,
-                           bg_image=bg_image)
+        # Default anomaly value
+        anomaly = False
+
+        return render_template('drought_predict.html', 
+                               anomaly=anomaly,
+                               location=location,
+                               date=date,
+                               year=year,
+                               precipitation=precipitation)
+
+
 
 
 

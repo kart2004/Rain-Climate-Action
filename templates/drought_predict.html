@@ -32,9 +32,10 @@
 </head>
 <body>
     <div class="container">
+        {% set display_month = month if month else "the selected period" %}
         {% if precipitation < 50 %}
             <h1>⚠️ High Risk of Drought</h1>
-            <p>The predicted precipitation is <strong>{{ precipitation }} mm</strong>, indicating a high risk of drought in {{ location }} during {{ month }} {{ year }}.</p>
+            <p>The predicted precipitation is <strong>{{ precipitation }} mm</strong>, indicating a high risk of drought in {{ location }} during {{ display_month }} {{ year }}.</p>
 
             <h2>💡 Preventive Measures:</h2>
             <ul>
@@ -46,7 +47,12 @@
             </ul>
         {% else %}
             <h1>🌿 Hooray!! Low Risk of Drought</h1>
-            <p>The predicted precipitation is <strong>{{ precipitation }} mm</strong>, which indicates a low risk of drought in {{ location }} during {{ month }} {{ year }}.</p>
+            <p>The predicted precipitation is <strong>{{ precipitation }} mm</strong>, which indicates a low risk of drought in {{ location }} during {{ display_month }} {{ year }}.</p>
+            
+            <h2>📊 Anomaly Check</h2>
+            <ul>
+                <li><strong>Anomaly Detected:</strong> {{ 'Yes' if anomaly else 'No' }}</li>
+            </ul>
         {% endif %}
     </div>
 </body>

@@ -61,7 +61,6 @@ def get_historical_data(state, year, quarter, terrain):
     return 0.0, 0  # Default values if no data found
 
 def get_rainfall_data(state_symbol, quarter):
-    """Get rainfall data for years > 2015"""
     try:
         rainfall_data = pd.read_csv('data/flood_gen.csv')
         given_state = rainfall_data['STATE'] == state_symbol
@@ -72,7 +71,27 @@ def get_rainfall_data(state_symbol, quarter):
         return 0.0
     except Exception as e:
         print(f"Error getting rainfall data: {e}")
+        return 0.0 
+    """Get future rainfall data for years > 2015 from flood_gen_future.csv
+    try:
+        # Load the future rainfall data
+        rainfall_data = pd.read_csv('data/flood_gen_future.csv')
+        
+        # Filter the data for the given state
+        given_state = rainfall_data['SUBDIVISION'] == state_symbol
+        filtered_data = rainfall_data[given_state]
+        
+        # Further filter the data for the given quarter
+        given_quarter = filtered_data['QUARTER'] == quarter
+        filtered_data = filtered_data[given_quarter]
+        
+        # Return the predicted precipitation if data exists
+        if len(filtered_data) > 0:
+            return filtered_data['PREDICTED_PRECIPITATION'].iloc[0]
         return 0.0
+    except Exception as e:
+        print(f"Error getting future rainfall data: {e}")
+        return 0.0 """
 
 def predict_with_model(state, precipitation, terrain):
     """Predict flood severity based on state, precipitation, and terrain"""

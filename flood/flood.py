@@ -72,7 +72,9 @@ def get_rainfall_data(state_symbol, quarter):
     except Exception as e:
         print(f"Error getting rainfall data: {e}")
         return 0.0 
-    """Get future rainfall data for years > 2015 from flood_gen_future.csv
+
+def generate_future_rainfall_data(state_symbol, quarter):
+    """Get future rainfall data for years > 2015 from flood_gen_future.csv"""
     try:
         # Load the future rainfall data
         rainfall_data = pd.read_csv('data/flood_gen_future.csv')
@@ -91,7 +93,7 @@ def get_rainfall_data(state_symbol, quarter):
         return 0.0
     except Exception as e:
         print(f"Error getting future rainfall data: {e}")
-        return 0.0 """
+        return 0.0 
 
 def predict_with_model(state, precipitation, terrain):
     """Predict flood severity based on state, precipitation, and terrain"""
@@ -338,3 +340,5 @@ def normalize_terrain(terrain):
     # Default fallback
     print(f"Warning: Unknown terrain '{terrain}', defaulting to Plain")
     return "Plain"
+
+

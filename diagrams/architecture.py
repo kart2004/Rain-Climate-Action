@@ -7,14 +7,14 @@ def create_climate_prediction_architecture(save_path='climate_prediction_archite
     """
     Creates a detailed architecture diagram for the Climate Action Prediction System.
     This diagram illustrates the flow of data, user input, processing, and predictions
-    for flood, drought, and landslide risks using AI/ML models and rule-based systems.
+    for flood, drought, landslide, erosion, and groundwater risks using AI/ML models and rule-based systems.
     
     Parameters:
     save_path (str): Path to save the diagram image
     dpi (int): Resolution of the saved image
     """
     # Create figure and axis
-    fig, ax = plt.subplots(figsize=(18, 14), facecolor='white')  # Increased figure size for clarity
+    fig, ax = plt.subplots(figsize=(20, 16), facecolor='white')  # Increased figure size for more components
     
     # Color scheme - using climate-related colors
     colors = {
@@ -24,6 +24,8 @@ def create_climate_prediction_architecture(save_path='climate_prediction_archite
         'flood': '#BBDEFB',  # Blue for flood prediction
         'drought': '#FFF3E0',  # Orange for drought prediction
         'landslide': '#E8EAF6',  # Purple for landslide prediction 
+        'erosion': '#FFECB3',  # Amber for erosion analysis
+        'groundwater': '#DCEDC8',  # Light green for groundwater analysis
         'output': '#F3E5F5',  # Light purple for output/results
         'api': '#F9FBE7',  # Light yellow for API services
         'arrows': '#455A64',  # Dark blue-gray for connections
@@ -50,6 +52,9 @@ def create_climate_prediction_architecture(save_path='climate_prediction_archite
         'generated_data': {'x': 6, 'y': 9.5, 'width': 3.2, 'height': 1.2, 'color': colors['data'], 
                      'label': 'Generated Climate Data\n- Flood Generation Data\n- State-wise Monthly Rainfall\n- Terrain Classification Data'},
         
+        'erosion_data': {'x': 11, 'y': 9.5, 'width': 3.2, 'height': 1.2, 'color': colors['data'], 
+                     'label': 'Erosion & Groundwater Data\n- State AAR & AER Values\n- R Factor Maps\n- Soil Permeability Data'},
+        
         # User Input Layer
         'user_input': {'x': 1, 'y': 7.5, 'width': box_width, 'height': box_height, 'color': colors['input'], 
                     'label': 'User Input Form\n- Location\n- Date'},
@@ -71,26 +76,48 @@ def create_climate_prediction_architecture(save_path='climate_prediction_archite
                           'label': 'Feature Extraction\n- ML-Ready Vectors'},
         
         # Prediction Engines
-        'flood_model': {'x': 2.5, 'y': 4.1, 'width': box_width + 0.5, 'height': box_height, 'color': colors['flood'], 
-                    'label': 'Flood Prediction Engine\n- TensorFlow Model\n'},
-        'drought_model': {'x': 6.0, 'y': 4.1, 'width': box_width + 0.5, 'height': box_height, 'color': colors['drought'], 
-                     'label': 'Drought Analysis Engine\n- Rule-Based Thresholds'},
-        'landslide_model': {'x': 9.5, 'y': 4.1, 'width': box_width + 0.5, 'height': box_height, 'color': colors['landslide'], 
-                       'label': 'Landslide Risk Model\n- Ensemble ML'},
+        'flood_model': {'x': 1, 'y': 4.1, 'width': box_width + 0.5, 'height': box_height, 'color': colors['flood'], 
+                    'label': 'Flood Prediction Engine\n- Neural Network (TensorFlow)\n- Regularization (L2) & Dropout'},
+        'drought_model': {'x': 4, 'y': 4.1, 'width': box_width + 0.5, 'height': box_height, 'color': colors['drought'], 
+                     'label': 'Drought Analysis Engine\n- Rule-Based Thresholds\n- Historical Precipitation Analysis'},
+        'landslide_model': {'x': 7, 'y': 4.1, 'width': box_width + 0.5, 'height': box_height, 'color': colors['landslide'], 
+                       'label': 'Landslide Risk Model\n- Ensemble ML\n- Terrain-Based Classification'},
+        'erosion_model': {'x': 10, 'y': 4.1, 'width': box_width + 0.5, 'height': box_height, 'color': colors['erosion'], 
+                       'label': 'Erosion Analysis Engine\n- R Factor Calculation\n- Energy-Based Modeling (E=0.05*rainfall)\n- AAR/AER Integration'},
+        'groundwater_model': {'x': 13, 'y': 4.1, 'width': box_width + 0.5, 'height': box_height, 'color': colors['groundwater'], 
+                       'label': 'Groundwater Analysis\n- Linear Regression (R²=0.86)\n- KMeans (3 clusters)\n- Recharge Calculation'},
+        
+        # Technical detail boxes for ML models
+        'flood_tech': {'x': 1, 'y': 3.2, 'width': box_width + 0.5, 'height': 0.5, 'color': colors['tensorflow'], 
+                    'label': 'TensorFlow Neural Network\nL2 Regularization & Feature Engineering'},
+        'erosion_tech': {'x': 10, 'y': 3.2, 'width': box_width + 0.5, 'height': 0.6, 'color': colors['rule_based'], 
+                    'label': 'R = (rainfall*E)/AAR\nE = rainfall × 0.05\nState-specific AAR/AER calibration'},
+        'groundwater_tech': {'x': 13, 'y': 3.2, 'width': box_width + 0.5, 'height': 0.6, 'color': colors['sklearn'], 
+                    'label': 'Recharge = Rainfall × (1-AvgR/10000)\nStandardScaler preprocessing\nKMeans n_clusters=3'},
         
         # Output Processing Layer
-        'severity_classification': {'x': 2.5, 'y': 2.5, 'width': box_width + 0.5, 'height': box_height, 'color': colors['output'], 
-                              'label': 'Severity Classification\n- Risk Levels'},
-        'result_aggregation': {'x': 6.0, 'y': 2.5, 'width': box_width + 0.5, 'height': box_height, 'color': colors['output'], 
+        'severity_classification': {'x': 2.5, 'y': 2.3, 'width': box_width + 0.5, 'height': box_height, 'color': colors['output'], 
+                              'label': 'Severity Classification\n- Risk Levels (0-5 scale)'},
+        'result_aggregation': {'x': 6.0, 'y': 2.3, 'width': box_width + 0.5, 'height': box_height, 'color': colors['output'], 
                           'label': 'Result Aggregation\n- Combine Predictions'},
-        'summary_generation': {'x': 9.5, 'y': 2.5, 'width': box_width + 0.5, 'height': box_height, 'color': colors['output'], 
+        'summary_generation': {'x': 9.5, 'y': 2.3, 'width': box_width + 0.5, 'height': box_height, 'color': colors['output'], 
                           'label': 'Prediction Summary\n- User-Friendly Output'},
+        'insight_generation': {'x': 12.5, 'y': 2.3, 'width': box_width + 0.5, 'height': box_height, 'color': colors['output'], 
+                          'label': 'Advanced Insights\n- Groundwater Impact\n- Soil Deterioration Risk'},
         
         # Final Output Layer
         'prediction_display': {'x': 4.2, 'y': 1, 'width': box_width + 0.5, 'height': box_height, 'color': colors['output'], 
                           'label': 'Climate Risk Visualization\n- Interactive UI'},
         'recommendation': {'x': 7.8, 'y': 1, 'width': box_width + 0.5, 'height': box_height, 'color': colors['output'], 
-                       'label': 'Safety Recommendations\n- Actionable Advice'}
+                       'label': 'Safety Recommendations\n- Actionable Advice'},
+        
+        # Add additional erosion components
+        'erosion_calculation': {'x': 12, 'y': 5.0, 'width': box_width, 'height': 0.5, 'color': colors['erosion'], 
+                           'label': 'R-Factor Calculator\nState-Calibrated Model'},
+        
+        # Add additional groundwater components
+        'groundwater_prediction': {'x': 14, 'y': 5.0, 'width': box_width, 'height': 0.5, 'color': colors['groundwater'], 
+                             'label': 'Recharge Predictor\nRainfall-Based Model'},
     }
     
     # Draw rounded rectangles for each component
@@ -179,6 +206,8 @@ def create_climate_prediction_architecture(save_path='climate_prediction_archite
     # Data to Input
     draw_arrow('historical_data', 'state_terrain', curved=0.4)
     draw_arrow('generated_data', 'rainfall_data', curved=0.4)
+    draw_arrow('erosion_data', 'rainfall_data', curved=0.4)
+    draw_arrow('erosion_data', 'state_terrain', curved=0.6, custom_control=(12, 8.2))
     
     # User Input Flow
     draw_arrow('user_input', 'location_input')
@@ -198,6 +227,13 @@ def create_climate_prediction_architecture(save_path='climate_prediction_archite
                custom_control=(10, 4.8))
     draw_arrow('feature_extraction', 'drought_model', curved=0.3)
     draw_arrow('feature_extraction', 'landslide_model', curved=0.2)
+    draw_arrow('feature_extraction', 'erosion_model', curved=0.2)
+    draw_arrow('feature_extraction', 'groundwater_model', curved=0.5, custom_control=(12, 5.3))
+    
+    # Technical details connections
+    draw_arrow('flood_model', 'flood_tech', curved=0)
+    draw_arrow('erosion_model', 'erosion_tech', curved=0)
+    draw_arrow('groundwater_model', 'groundwater_tech', curved=0)
     
     # Prediction to output processing
     draw_arrow('flood_model', 'severity_classification', curved=0.2)
@@ -205,8 +241,11 @@ def create_climate_prediction_architecture(save_path='climate_prediction_archite
                custom_control=(4.8, 3.3))
     draw_arrow('landslide_model', 'severity_classification', curved=0.5,
                custom_control=(4, 3.5))
+    draw_arrow('erosion_model', 'severity_classification', curved=0.6, custom_control=(5, 3.8))
+    draw_arrow('groundwater_model', 'insight_generation', curved=0.3)
     draw_arrow('severity_classification', 'result_aggregation', curved=0.2)
     draw_arrow('result_aggregation', 'summary_generation', curved=0.2)
+    draw_arrow('insight_generation', 'summary_generation', curved=0.3)
     
     # Final output
     draw_arrow('summary_generation', 'prediction_display', curved=0.3,
@@ -233,8 +272,8 @@ def create_climate_prediction_architecture(save_path='climate_prediction_archite
     ax.axis('off')
     
     # Add title
-    #plt.title('Climate Action Prediction System Architecture', 
-    #          fontsize=18, fontweight='bold', pad=20)
+    plt.title('Climate Action Prediction System Architecture', 
+              fontsize=18, fontweight='bold', pad=20)
     
     # Ensure tight layout
     plt.tight_layout()
@@ -247,11 +286,13 @@ def create_climate_prediction_architecture(save_path='climate_prediction_archite
         patches.Patch(facecolor=colors['flood'], edgecolor=colors['border'], label='Flood Prediction'),
         patches.Patch(facecolor=colors['drought'], edgecolor=colors['border'], label='Drought Prediction'),
         patches.Patch(facecolor=colors['landslide'], edgecolor=colors['border'], label='Landslide Prediction'),
+        patches.Patch(facecolor=colors['erosion'], edgecolor=colors['border'], label='Erosion Analysis', linewidth=3),
+        patches.Patch(facecolor=colors['groundwater'], edgecolor=colors['border'], label='Groundwater Analysis', linewidth=3),
         patches.Patch(facecolor=colors['output'], edgecolor=colors['border'], label='Output & Visualization'),
         patches.Patch(facecolor=colors['api'], edgecolor=colors['border'], label='External API Services')
     ]
     ax.legend(handles=legend_elements, loc='lower center', 
-              bbox_to_anchor=(1, -0.1), ncol=4, fontsize=10, frameon=False)
+              bbox_to_anchor=(0.5, -0.1), ncol=5, fontsize=10, frameon=False)
     
     # Save the figure
     plt.savefig(save_path, dpi=dpi, bbox_inches='tight')

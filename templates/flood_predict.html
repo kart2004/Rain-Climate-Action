@@ -175,6 +175,36 @@
                                 
                                 <div class="d-flex flex-wrap justify-content-between align-items-start mt-5">
                                     <!-- Left: Heading + Buttons -->
+                                    <header class="entry-header">
+                                        <h1>
+                                            {% if rf < 100 %} Minimal soil erosion risk!
+                                            {% elif rf < 250 %} Light rains, low erosive power!
+                                            {% elif rf < 500 %} Moderate erosive potential — be alert!
+                                            {% elif rf < 750 %} Significant erosion risk — protect soil!
+                                            {% elif rf < 1000 %} High rainfall erosivity — take precautions!
+                                            {% else %} Extreme erosivity! Severe flood and erosion risk!
+                                            {% endif %}
+                                        </h1>
+                                    </header>
+                                    
+                                    <div class="entry-content mt-4">
+                                        <p>
+                                            {% if rf < 100 %}
+                                                The calculated R-factor indicates very low kinetic energy in rainfall. This suggests minimal risk of soil erosion or water damage.
+                                            {% elif rf < 250 %}
+                                                The rainfall in this region is only mildly erosive. While it’s not alarming, preventive soil conservation methods are still good practice.
+                                            {% elif rf < 500 %}
+                                                Moderate levels of kinetic energy suggest noticeable rainfall erosivity. Expect occasional runoff or minor flooding in vulnerable areas.
+                                            {% elif rf < 750 %}
+                                                R-factor is high enough to raise concern. Areas with weak drainage or unprotected land may experience serious erosion or water pooling.
+                                            {% elif rf < 1000 %}
+                                                Rainfall shows strong erosive characteristics. Prepare for rapid runoff, possible flash floods, and soil degradation if unmitigated.
+                                            {% else %}
+                                                The R-factor indicates extremely intense rainfall activity. Expect severe erosion, potential landslides, and high flood danger. Take immediate protective action!
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                    
                                     <div class="left-content" style="flex: 1; min-width: 300px; max-width: 40%;">
                                         <h2 style="color: white; font-weight: bold;">Current R-Factor: <strong>{{ rf }}</strong></h2>
                                         <p style="color: white;">This is the measure of the rainfall's potential to cause soil erosion in your area.</p>
@@ -189,12 +219,11 @@
                                         <div id="rFactorCalc" class="fade-in transparent-dark mb-3" style="display: none;">
                                             <h4>R-Factor Calculation</h4>
                                             <p>The R-factor is calculated based on rainfall intensity and its erosion potential. Formula:</p>
-                                            <h5>R = P × I × C × K</h5>
+                                            <h5>R = P × K</h5>
                                             <ul>
                                                 <li><strong>P</strong>: Precipitation (mm)</li>
-                                                <li><strong>I</strong>: Rainfall intensity</li>
-                                                <li><strong>C</strong>: Soil cover factor</li>
-                                                <li><strong>K</strong>: Erosion factor</li>
+                                                
+                                                <li><strong>K</strong>: Kinetic Energy of Rainfall</li>
                                             </ul>
                                         </div>
                                 

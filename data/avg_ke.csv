@@ -1,0 +1,685 @@
+State,Year,Average_KE_MJ_per_ha_mm
+Andhra Pradesh,2005,0.256
+Andhra Pradesh,2006,0.343
+Andhra Pradesh,2007,0.31
+Andhra Pradesh,2008,0.29
+Andhra Pradesh,2009,0.223
+Andhra Pradesh,2010,0.223
+Andhra Pradesh,2011,0.209
+Andhra Pradesh,2012,0.33
+Andhra Pradesh,2013,0.29
+Andhra Pradesh,2014,0.306
+Andhra Pradesh,2015,0.203
+Andhra Pradesh,2016,0.345
+Andhra Pradesh,2017,0.325
+Andhra Pradesh,2018,0.232
+Andhra Pradesh,2019,0.227
+Andhra Pradesh,2020,0.228
+Andhra Pradesh,2021,0.246
+Andhra Pradesh,2022,0.279
+Andhra Pradesh,2023,0.265
+Arunachal Pradesh,2005,0.244
+Arunachal Pradesh,2006,0.292
+Arunachal Pradesh,2007,0.221
+Arunachal Pradesh,2008,0.244
+Arunachal Pradesh,2009,0.255
+Arunachal Pradesh,2010,0.268
+Arunachal Pradesh,2011,0.318
+Arunachal Pradesh,2012,0.23
+Arunachal Pradesh,2013,0.277
+Arunachal Pradesh,2014,0.289
+Arunachal Pradesh,2015,0.207
+Arunachal Pradesh,2016,0.291
+Arunachal Pradesh,2017,0.226
+Arunachal Pradesh,2018,0.21
+Arunachal Pradesh,2019,0.342
+Arunachal Pradesh,2020,0.345
+Arunachal Pradesh,2021,0.321
+Arunachal Pradesh,2022,0.246
+Arunachal Pradesh,2023,0.215
+Assam,2005,0.303
+Assam,2006,0.266
+Assam,2007,0.218
+Assam,2008,0.274
+Assam,2009,0.205
+Assam,2010,0.336
+Assam,2011,0.239
+Assam,2012,0.299
+Assam,2013,0.247
+Assam,2014,0.278
+Assam,2015,0.282
+Assam,2016,0.228
+Assam,2017,0.345
+Assam,2018,0.316
+Assam,2019,0.341
+Assam,2020,0.334
+Assam,2021,0.29
+Assam,2022,0.338
+Assam,2023,0.213
+Bihar,2005,0.229
+Bihar,2006,0.207
+Bihar,2007,0.249
+Bihar,2008,0.258
+Bihar,2009,0.241
+Bihar,2010,0.324
+Bihar,2011,0.254
+Bihar,2012,0.242
+Bihar,2013,0.281
+Bihar,2014,0.221
+Bihar,2015,0.32
+Bihar,2016,0.211
+Bihar,2017,0.348
+Bihar,2018,0.316
+Bihar,2019,0.23
+Bihar,2020,0.201
+Bihar,2021,0.322
+Bihar,2022,0.306
+Bihar,2023,0.309
+Chhattisgarh,2005,0.316
+Chhattisgarh,2006,0.211
+Chhattisgarh,2007,0.254
+Chhattisgarh,2008,0.217
+Chhattisgarh,2009,0.329
+Chhattisgarh,2010,0.293
+Chhattisgarh,2011,0.25
+Chhattisgarh,2012,0.21
+Chhattisgarh,2013,0.247
+Chhattisgarh,2014,0.249
+Chhattisgarh,2015,0.309
+Chhattisgarh,2016,0.296
+Chhattisgarh,2017,0.333
+Chhattisgarh,2018,0.271
+Chhattisgarh,2019,0.218
+Chhattisgarh,2020,0.307
+Chhattisgarh,2021,0.314
+Chhattisgarh,2022,0.284
+Chhattisgarh,2023,0.316
+Goa,2005,0.274
+Goa,2006,0.278
+Goa,2007,0.264
+Goa,2008,0.204
+Goa,2009,0.216
+Goa,2010,0.205
+Goa,2011,0.295
+Goa,2012,0.247
+Goa,2013,0.276
+Goa,2014,0.336
+Goa,2015,0.237
+Goa,2016,0.262
+Goa,2017,0.313
+Goa,2018,0.234
+Goa,2019,0.212
+Goa,2020,0.243
+Goa,2021,0.224
+Goa,2022,0.339
+Goa,2023,0.321
+Gujarat,2005,0.295
+Gujarat,2006,0.331
+Gujarat,2007,0.321
+Gujarat,2008,0.228
+Gujarat,2009,0.334
+Gujarat,2010,0.281
+Gujarat,2011,0.321
+Gujarat,2012,0.334
+Gujarat,2013,0.248
+Gujarat,2014,0.217
+Gujarat,2015,0.234
+Gujarat,2016,0.264
+Gujarat,2017,0.323
+Gujarat,2018,0.329
+Gujarat,2019,0.201
+Gujarat,2020,0.277
+Gujarat,2021,0.263
+Gujarat,2022,0.233
+Gujarat,2023,0.218
+Haryana,2005,0.251
+Haryana,2006,0.341
+Haryana,2007,0.248
+Haryana,2008,0.278
+Haryana,2009,0.305
+Haryana,2010,0.255
+Haryana,2011,0.346
+Haryana,2012,0.344
+Haryana,2013,0.238
+Haryana,2014,0.275
+Haryana,2015,0.245
+Haryana,2016,0.243
+Haryana,2017,0.206
+Haryana,2018,0.291
+Haryana,2019,0.275
+Haryana,2020,0.208
+Haryana,2021,0.242
+Haryana,2022,0.336
+Haryana,2023,0.236
+Himachal Pradesh,2005,0.222
+Himachal Pradesh,2006,0.273
+Himachal Pradesh,2007,0.348
+Himachal Pradesh,2008,0.236
+Himachal Pradesh,2009,0.301
+Himachal Pradesh,2010,0.314
+Himachal Pradesh,2011,0.236
+Himachal Pradesh,2012,0.309
+Himachal Pradesh,2013,0.255
+Himachal Pradesh,2014,0.295
+Himachal Pradesh,2015,0.295
+Himachal Pradesh,2016,0.28
+Himachal Pradesh,2017,0.214
+Himachal Pradesh,2018,0.325
+Himachal Pradesh,2019,0.248
+Himachal Pradesh,2020,0.228
+Himachal Pradesh,2021,0.206
+Himachal Pradesh,2022,0.289
+Himachal Pradesh,2023,0.302
+Jharkhand,2005,0.202
+Jharkhand,2006,0.277
+Jharkhand,2007,0.234
+Jharkhand,2008,0.297
+Jharkhand,2009,0.226
+Jharkhand,2010,0.304
+Jharkhand,2011,0.258
+Jharkhand,2012,0.341
+Jharkhand,2013,0.221
+Jharkhand,2014,0.251
+Jharkhand,2015,0.217
+Jharkhand,2016,0.339
+Jharkhand,2017,0.332
+Jharkhand,2018,0.239
+Jharkhand,2019,0.299
+Jharkhand,2020,0.323
+Jharkhand,2021,0.283
+Jharkhand,2022,0.279
+Jharkhand,2023,0.236
+Karnataka,2005,0.214
+Karnataka,2006,0.335
+Karnataka,2007,0.335
+Karnataka,2008,0.295
+Karnataka,2009,0.251
+Karnataka,2010,0.252
+Karnataka,2011,0.309
+Karnataka,2012,0.335
+Karnataka,2013,0.333
+Karnataka,2014,0.317
+Karnataka,2015,0.296
+Karnataka,2016,0.213
+Karnataka,2017,0.224
+Karnataka,2018,0.335
+Karnataka,2019,0.291
+Karnataka,2020,0.201
+Karnataka,2021,0.215
+Karnataka,2022,0.3
+Karnataka,2023,0.201
+Kerala,2005,0.224
+Kerala,2006,0.282
+Kerala,2007,0.304
+Kerala,2008,0.298
+Kerala,2009,0.234
+Kerala,2010,0.307
+Kerala,2011,0.236
+Kerala,2012,0.249
+Kerala,2013,0.312
+Kerala,2014,0.297
+Kerala,2015,0.327
+Kerala,2016,0.299
+Kerala,2017,0.285
+Kerala,2018,0.214
+Kerala,2019,0.255
+Kerala,2020,0.24
+Kerala,2021,0.237
+Kerala,2022,0.346
+Kerala,2023,0.259
+Madhya Pradesh,2005,0.334
+Madhya Pradesh,2006,0.295
+Madhya Pradesh,2007,0.319
+Madhya Pradesh,2008,0.275
+Madhya Pradesh,2009,0.287
+Madhya Pradesh,2010,0.274
+Madhya Pradesh,2011,0.229
+Madhya Pradesh,2012,0.308
+Madhya Pradesh,2013,0.242
+Madhya Pradesh,2014,0.204
+Madhya Pradesh,2015,0.297
+Madhya Pradesh,2016,0.227
+Madhya Pradesh,2017,0.341
+Madhya Pradesh,2018,0.343
+Madhya Pradesh,2019,0.337
+Madhya Pradesh,2020,0.256
+Madhya Pradesh,2021,0.202
+Madhya Pradesh,2022,0.339
+Madhya Pradesh,2023,0.264
+Maharashtra,2005,0.345
+Maharashtra,2006,0.345
+Maharashtra,2007,0.328
+Maharashtra,2008,0.244
+Maharashtra,2009,0.258
+Maharashtra,2010,0.328
+Maharashtra,2011,0.248
+Maharashtra,2012,0.225
+Maharashtra,2013,0.284
+Maharashtra,2014,0.34
+Maharashtra,2015,0.304
+Maharashtra,2016,0.286
+Maharashtra,2017,0.215
+Maharashtra,2018,0.292
+Maharashtra,2019,0.349
+Maharashtra,2020,0.221
+Maharashtra,2021,0.278
+Maharashtra,2022,0.332
+Maharashtra,2023,0.311
+Manipur,2005,0.305
+Manipur,2006,0.305
+Manipur,2007,0.254
+Manipur,2008,0.244
+Manipur,2009,0.321
+Manipur,2010,0.322
+Manipur,2011,0.33
+Manipur,2012,0.337
+Manipur,2013,0.277
+Manipur,2014,0.275
+Manipur,2015,0.32
+Manipur,2016,0.297
+Manipur,2017,0.305
+Manipur,2018,0.319
+Manipur,2019,0.334
+Manipur,2020,0.251
+Manipur,2021,0.256
+Manipur,2022,0.214
+Manipur,2023,0.287
+Meghalaya,2005,0.205
+Meghalaya,2006,0.27
+Meghalaya,2007,0.281
+Meghalaya,2008,0.243
+Meghalaya,2009,0.289
+Meghalaya,2010,0.205
+Meghalaya,2011,0.206
+Meghalaya,2012,0.323
+Meghalaya,2013,0.254
+Meghalaya,2014,0.219
+Meghalaya,2015,0.278
+Meghalaya,2016,0.315
+Meghalaya,2017,0.232
+Meghalaya,2018,0.293
+Meghalaya,2019,0.213
+Meghalaya,2020,0.208
+Meghalaya,2021,0.28
+Meghalaya,2022,0.281
+Meghalaya,2023,0.296
+Mizoram,2005,0.309
+Mizoram,2006,0.346
+Mizoram,2007,0.277
+Mizoram,2008,0.248
+Mizoram,2009,0.319
+Mizoram,2010,0.241
+Mizoram,2011,0.266
+Mizoram,2012,0.212
+Mizoram,2013,0.204
+Mizoram,2014,0.344
+Mizoram,2015,0.325
+Mizoram,2016,0.304
+Mizoram,2017,0.261
+Mizoram,2018,0.226
+Mizoram,2019,0.223
+Mizoram,2020,0.238
+Mizoram,2021,0.282
+Mizoram,2022,0.307
+Mizoram,2023,0.299
+Nagaland,2005,0.242
+Nagaland,2006,0.343
+Nagaland,2007,0.311
+Nagaland,2008,0.283
+Nagaland,2009,0.292
+Nagaland,2010,0.263
+Nagaland,2011,0.237
+Nagaland,2012,0.253
+Nagaland,2013,0.314
+Nagaland,2014,0.202
+Nagaland,2015,0.217
+Nagaland,2016,0.207
+Nagaland,2017,0.206
+Nagaland,2018,0.328
+Nagaland,2019,0.306
+Nagaland,2020,0.271
+Nagaland,2021,0.215
+Nagaland,2022,0.274
+Nagaland,2023,0.271
+Odisha,2005,0.226
+Odisha,2006,0.265
+Odisha,2007,0.26
+Odisha,2008,0.292
+Odisha,2009,0.295
+Odisha,2010,0.207
+Odisha,2011,0.256
+Odisha,2012,0.294
+Odisha,2013,0.275
+Odisha,2014,0.328
+Odisha,2015,0.299
+Odisha,2016,0.224
+Odisha,2017,0.211
+Odisha,2018,0.296
+Odisha,2019,0.204
+Odisha,2020,0.288
+Odisha,2021,0.341
+Odisha,2022,0.286
+Odisha,2023,0.258
+Punjab,2005,0.296
+Punjab,2006,0.269
+Punjab,2007,0.282
+Punjab,2008,0.341
+Punjab,2009,0.258
+Punjab,2010,0.344
+Punjab,2011,0.336
+Punjab,2012,0.229
+Punjab,2013,0.21
+Punjab,2014,0.215
+Punjab,2015,0.203
+Punjab,2016,0.214
+Punjab,2017,0.302
+Punjab,2018,0.211
+Punjab,2019,0.248
+Punjab,2020,0.327
+Punjab,2021,0.203
+Punjab,2022,0.322
+Punjab,2023,0.242
+Rajasthan,2005,0.218
+Rajasthan,2006,0.305
+Rajasthan,2007,0.294
+Rajasthan,2008,0.332
+Rajasthan,2009,0.31
+Rajasthan,2010,0.321
+Rajasthan,2011,0.242
+Rajasthan,2012,0.227
+Rajasthan,2013,0.313
+Rajasthan,2014,0.321
+Rajasthan,2015,0.349
+Rajasthan,2016,0.262
+Rajasthan,2017,0.256
+Rajasthan,2018,0.316
+Rajasthan,2019,0.251
+Rajasthan,2020,0.34
+Rajasthan,2021,0.329
+Rajasthan,2022,0.264
+Rajasthan,2023,0.313
+Sikkim,2005,0.313
+Sikkim,2006,0.215
+Sikkim,2007,0.335
+Sikkim,2008,0.276
+Sikkim,2009,0.324
+Sikkim,2010,0.248
+Sikkim,2011,0.334
+Sikkim,2012,0.258
+Sikkim,2013,0.202
+Sikkim,2014,0.336
+Sikkim,2015,0.214
+Sikkim,2016,0.248
+Sikkim,2017,0.343
+Sikkim,2018,0.343
+Sikkim,2019,0.286
+Sikkim,2020,0.295
+Sikkim,2021,0.267
+Sikkim,2022,0.244
+Sikkim,2023,0.249
+Tamil Nadu,2005,0.301
+Tamil Nadu,2006,0.313
+Tamil Nadu,2007,0.319
+Tamil Nadu,2008,0.318
+Tamil Nadu,2009,0.214
+Tamil Nadu,2010,0.274
+Tamil Nadu,2011,0.209
+Tamil Nadu,2012,0.282
+Tamil Nadu,2013,0.266
+Tamil Nadu,2014,0.333
+Tamil Nadu,2015,0.253
+Tamil Nadu,2016,0.218
+Tamil Nadu,2017,0.221
+Tamil Nadu,2018,0.314
+Tamil Nadu,2019,0.293
+Tamil Nadu,2020,0.215
+Tamil Nadu,2021,0.213
+Tamil Nadu,2022,0.305
+Tamil Nadu,2023,0.211
+Telangana,2005,0.323
+Telangana,2006,0.306
+Telangana,2007,0.212
+Telangana,2008,0.213
+Telangana,2009,0.348
+Telangana,2010,0.256
+Telangana,2011,0.256
+Telangana,2012,0.322
+Telangana,2013,0.342
+Telangana,2014,0.348
+Telangana,2015,0.313
+Telangana,2016,0.256
+Telangana,2017,0.213
+Telangana,2018,0.317
+Telangana,2019,0.284
+Telangana,2020,0.264
+Telangana,2021,0.336
+Telangana,2022,0.217
+Telangana,2023,0.274
+Tripura,2005,0.202
+Tripura,2006,0.27
+Tripura,2007,0.208
+Tripura,2008,0.218
+Tripura,2009,0.218
+Tripura,2010,0.297
+Tripura,2011,0.312
+Tripura,2012,0.288
+Tripura,2013,0.344
+Tripura,2014,0.256
+Tripura,2015,0.243
+Tripura,2016,0.33
+Tripura,2017,0.234
+Tripura,2018,0.344
+Tripura,2019,0.202
+Tripura,2020,0.345
+Tripura,2021,0.206
+Tripura,2022,0.334
+Tripura,2023,0.279
+Uttar Pradesh,2005,0.349
+Uttar Pradesh,2006,0.211
+Uttar Pradesh,2007,0.283
+Uttar Pradesh,2008,0.345
+Uttar Pradesh,2009,0.278
+Uttar Pradesh,2010,0.294
+Uttar Pradesh,2011,0.304
+Uttar Pradesh,2012,0.268
+Uttar Pradesh,2013,0.294
+Uttar Pradesh,2014,0.288
+Uttar Pradesh,2015,0.335
+Uttar Pradesh,2016,0.207
+Uttar Pradesh,2017,0.242
+Uttar Pradesh,2018,0.343
+Uttar Pradesh,2019,0.334
+Uttar Pradesh,2020,0.268
+Uttar Pradesh,2021,0.293
+Uttar Pradesh,2022,0.242
+Uttar Pradesh,2023,0.228
+Uttarakhand,2005,0.27
+Uttarakhand,2006,0.253
+Uttarakhand,2007,0.288
+Uttarakhand,2008,0.212
+Uttarakhand,2009,0.346
+Uttarakhand,2010,0.348
+Uttarakhand,2011,0.305
+Uttarakhand,2012,0.28
+Uttarakhand,2013,0.246
+Uttarakhand,2014,0.322
+Uttarakhand,2015,0.303
+Uttarakhand,2016,0.224
+Uttarakhand,2017,0.337
+Uttarakhand,2018,0.323
+Uttarakhand,2019,0.342
+Uttarakhand,2020,0.309
+Uttarakhand,2021,0.292
+Uttarakhand,2022,0.263
+Uttarakhand,2023,0.34
+West Bengal,2005,0.33
+West Bengal,2006,0.207
+West Bengal,2007,0.204
+West Bengal,2008,0.256
+West Bengal,2009,0.322
+West Bengal,2010,0.348
+West Bengal,2011,0.223
+West Bengal,2012,0.289
+West Bengal,2013,0.257
+West Bengal,2014,0.345
+West Bengal,2015,0.326
+West Bengal,2016,0.326
+West Bengal,2017,0.27
+West Bengal,2018,0.262
+West Bengal,2019,0.241
+West Bengal,2020,0.208
+West Bengal,2021,0.33
+West Bengal,2022,0.322
+West Bengal,2023,0.35
+Andaman and Nicobar Islands,2005,0.349
+Andaman and Nicobar Islands,2006,0.283
+Andaman and Nicobar Islands,2007,0.315
+Andaman and Nicobar Islands,2008,0.342
+Andaman and Nicobar Islands,2009,0.327
+Andaman and Nicobar Islands,2010,0.237
+Andaman and Nicobar Islands,2011,0.268
+Andaman and Nicobar Islands,2012,0.219
+Andaman and Nicobar Islands,2013,0.343
+Andaman and Nicobar Islands,2014,0.291
+Andaman and Nicobar Islands,2015,0.234
+Andaman and Nicobar Islands,2016,0.301
+Andaman and Nicobar Islands,2017,0.293
+Andaman and Nicobar Islands,2018,0.254
+Andaman and Nicobar Islands,2019,0.217
+Andaman and Nicobar Islands,2020,0.301
+Andaman and Nicobar Islands,2021,0.278
+Andaman and Nicobar Islands,2022,0.316
+Andaman and Nicobar Islands,2023,0.278
+Chandigarh,2005,0.328
+Chandigarh,2006,0.283
+Chandigarh,2007,0.284
+Chandigarh,2008,0.331
+Chandigarh,2009,0.261
+Chandigarh,2010,0.22
+Chandigarh,2011,0.204
+Chandigarh,2012,0.313
+Chandigarh,2013,0.293
+Chandigarh,2014,0.306
+Chandigarh,2015,0.232
+Chandigarh,2016,0.22
+Chandigarh,2017,0.202
+Chandigarh,2018,0.253
+Chandigarh,2019,0.288
+Chandigarh,2020,0.259
+Chandigarh,2021,0.266
+Chandigarh,2022,0.336
+Chandigarh,2023,0.252
+Dadra and Nagar Haveli and Daman and Diu,2005,0.277
+Dadra and Nagar Haveli and Daman and Diu,2006,0.318
+Dadra and Nagar Haveli and Daman and Diu,2007,0.259
+Dadra and Nagar Haveli and Daman and Diu,2008,0.293
+Dadra and Nagar Haveli and Daman and Diu,2009,0.329
+Dadra and Nagar Haveli and Daman and Diu,2010,0.342
+Dadra and Nagar Haveli and Daman and Diu,2011,0.222
+Dadra and Nagar Haveli and Daman and Diu,2012,0.339
+Dadra and Nagar Haveli and Daman and Diu,2013,0.274
+Dadra and Nagar Haveli and Daman and Diu,2014,0.239
+Dadra and Nagar Haveli and Daman and Diu,2015,0.269
+Dadra and Nagar Haveli and Daman and Diu,2016,0.347
+Dadra and Nagar Haveli and Daman and Diu,2017,0.274
+Dadra and Nagar Haveli and Daman and Diu,2018,0.249
+Dadra and Nagar Haveli and Daman and Diu,2019,0.295
+Dadra and Nagar Haveli and Daman and Diu,2020,0.236
+Dadra and Nagar Haveli and Daman and Diu,2021,0.211
+Dadra and Nagar Haveli and Daman and Diu,2022,0.219
+Dadra and Nagar Haveli and Daman and Diu,2023,0.219
+Delhi,2005,0.223
+Delhi,2006,0.221
+Delhi,2007,0.296
+Delhi,2008,0.227
+Delhi,2009,0.252
+Delhi,2010,0.335
+Delhi,2011,0.271
+Delhi,2012,0.3
+Delhi,2013,0.226
+Delhi,2014,0.229
+Delhi,2015,0.206
+Delhi,2016,0.225
+Delhi,2017,0.242
+Delhi,2018,0.227
+Delhi,2019,0.213
+Delhi,2020,0.218
+Delhi,2021,0.269
+Delhi,2022,0.231
+Delhi,2023,0.255
+Jammu and Kashmir,2005,0.276
+Jammu and Kashmir,2006,0.304
+Jammu and Kashmir,2007,0.206
+Jammu and Kashmir,2008,0.32
+Jammu and Kashmir,2009,0.294
+Jammu and Kashmir,2010,0.212
+Jammu and Kashmir,2011,0.331
+Jammu and Kashmir,2012,0.338
+Jammu and Kashmir,2013,0.209
+Jammu and Kashmir,2014,0.242
+Jammu and Kashmir,2015,0.321
+Jammu and Kashmir,2016,0.312
+Jammu and Kashmir,2017,0.228
+Jammu and Kashmir,2018,0.231
+Jammu and Kashmir,2019,0.256
+Jammu and Kashmir,2020,0.273
+Jammu and Kashmir,2021,0.293
+Jammu and Kashmir,2022,0.255
+Jammu and Kashmir,2023,0.269
+Ladakh,2005,0.312
+Ladakh,2006,0.206
+Ladakh,2007,0.238
+Ladakh,2008,0.307
+Ladakh,2009,0.334
+Ladakh,2010,0.277
+Ladakh,2011,0.28
+Ladakh,2012,0.216
+Ladakh,2013,0.267
+Ladakh,2014,0.28
+Ladakh,2015,0.236
+Ladakh,2016,0.24
+Ladakh,2017,0.257
+Ladakh,2018,0.203
+Ladakh,2019,0.248
+Ladakh,2020,0.232
+Ladakh,2021,0.249
+Ladakh,2022,0.218
+Ladakh,2023,0.334
+Lakshadweep,2005,0.289
+Lakshadweep,2006,0.302
+Lakshadweep,2007,0.318
+Lakshadweep,2008,0.275
+Lakshadweep,2009,0.213
+Lakshadweep,2010,0.281
+Lakshadweep,2011,0.288
+Lakshadweep,2012,0.312
+Lakshadweep,2013,0.265
+Lakshadweep,2014,0.219
+Lakshadweep,2015,0.243
+Lakshadweep,2016,0.254
+Lakshadweep,2017,0.297
+Lakshadweep,2018,0.286
+Lakshadweep,2019,0.253
+Lakshadweep,2020,0.348
+Lakshadweep,2021,0.291
+Lakshadweep,2022,0.236
+Lakshadweep,2023,0.215
+Puducherry,2005,0.223
+Puducherry,2006,0.237
+Puducherry,2007,0.224
+Puducherry,2008,0.228
+Puducherry,2009,0.243
+Puducherry,2010,0.226
+Puducherry,2011,0.335
+Puducherry,2012,0.212
+Puducherry,2013,0.279
+Puducherry,2014,0.262
+Puducherry,2015,0.347
+Puducherry,2016,0.217
+Puducherry,2017,0.26
+Puducherry,2018,0.345
+Puducherry,2019,0.33
+Puducherry,2020,0.323
+Puducherry,2021,0.239
+Puducherry,2022,0.226
+Puducherry,2023,0.3

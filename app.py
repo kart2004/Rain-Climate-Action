@@ -16,7 +16,7 @@ from flood.flood import (
     predict_flood_severity,
     create_encoder_and_scaler
 )
-
+from erosion.erosion import predict_r_factor
 # Import drought-related functionality
 from drought.drought import (
     predict_drought
@@ -382,7 +382,7 @@ def predict():
             precipitation=round(precipitation, 2), 
             terrain=terrain, 
             year=year,
-            rf = int(precipitation / 2)
+            rf = predict_r_factor(state, year, precipitation)  
         )
     # For years > 2015, predict using model
     else:
@@ -405,7 +405,7 @@ def predict():
                 precipitation=round(precipitation, 2), 
                 terrain=terrain, 
                 year=year,
-                rf = precipitation/2
+                rf = predict_r_factor(state, year, precipitation)  
             )
         except Exception as e:
             return render_template('error.html', error=str(e), city=city, state=state)

@@ -1,40 +1,55 @@
-import csv
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.metrics import root_mean_squared_error, r2_score
 
-# Function to read the CSV and load the data into a dictionary
-def load_state_data(csv_filename):
-    state_data = {}
-    with open(csv_filename, mode="r") as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            state = row['State']
-            AAR = int(row['AAR'])
-            AER = float(row['AER'])
-            state_data[state] = {"AAR": AAR, "AER": AER}
-    return state_data
+# Load dataset
+df = pd.read_csv("data/avg_ke.csv")
 
-# Function to calculate the R Factor based on state and rainfall
-def calculate_r_factor(state, rainfall_mm, csv_filename="data/erosion_data.csv"):
-    # Load the state data from the CSV file
-    state_data = load_state_data(csv_filename)
-    
-    # Check if the state is valid
-    if state not in state_data:
-        return f"State '{state}' not found. Please check the state name."
-    
-    # Get the AAR and AER for the state
-    state_info = state_data[state]
-    AAR = state_info["AAR"]
-    AER = state_info["AER"]
-    
-    # Calculate the energy of the rainfall (E)
-    E = rainfall_mm * 0.05  # Simple estimate for energy calculation
-    
-    # Calculate the R factor for the given rainfall
-    R_factor = (rainfall_mm * E) / AAR
-    
-    return {
-        "State": state,
-        "AAR": AAR,
-        "AER": AER,
-        "R Factor": R_factor
-    }
+# Features and target
+X = df[['State', 'Year']]
+y = df['Average_KE_MJ_per_ha_mm']
+
+# Preprocessing: One-hot encode the State column
+categorical_features = ['State']
+numerical_features = ['Year']
+
+# Create column transformer
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_features),
+        ('num', 'passthrough', numerical_features)
+    ]
+)
+
+# Create a pipeline with Random Forest Regressor
+model = Pipeline(steps=[
+    ('preprocessor', preprocessor),
+    ('regressor', RandomForestRegressor(n_estimators=100, random_state=42))
+])
+
+# Train-test split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train the model
+model.fit(X_train, y_train)
+
+# Evaluate
+y_pred = model.predict(X_test)
+print("RMSE:", root_mean_squared_error(y_test, y_pred))
+print("R² Score:", r2_score(y_test, y_pred))
+
+# 🔍 Prediction function
+def predict_ke(state, year):
+    input_df = pd.DataFrame({'State': [state], 'Year': [year]})
+    prediction = model.predict(input_df)[0]
+    return round(prediction, 3)
+
+def predict_r_factor(state, year, precipitation_mm):
+    ke = predict_ke(state, year)  # Predict kinetic energy
+    r = ke * precipitation_mm     # R-factor = KE × Precipitation
+    return round(r, 2)
+

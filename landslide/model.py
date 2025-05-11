@@ -2,10 +2,14 @@ import joblib
 import pandas as pd
 import os
 
-# Function to load the models and handle any file loading errors
 states=['Andaman and Nicobar Islands', 'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chandigarh', 'Chhattisgarh', 'Delhi', 'Goa', 'Gujarat', 
  'Haryana', 'Himachal Pradesh', 'Jammu and Kashmir', 'Jharkhand', 'Karnataka', 'Kerala', 'Lakshadweep', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 
  'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal']
+
+
+month_map={
+    "January":1,"February":2,"March":3,"April":4,"May":5,"June":6,"July":7,"August":8,"September":9,"October":10,"November":11,"December":12
+}
 
 city_to_state = {
             'New Delhi': 'DL',
@@ -78,15 +82,13 @@ def load_model(model_path):
 
 # Load models and scalers at the top of your script
 try:
-    rf_model = load_model('model/RF_predict_model_no_month.joblib')
-    logreg_model = load_model('model/logreg_predict_model_no_month.joblib')
-    scaler = load_model('model/Landslide_Scaler_no_month.joblib')
-    le = load_model('model/State_Label_Encoder_no_month.joblib')
+    model=load_model('model/XGBoost.pkl')
+    le = load_model('model/State_encoder_XG.joblib')
 except Exception as e:
     print(" Critical error: Models could not be loaded. Exiting the application.")
     exit(1)  # Exit if models cannot be loaded
 
-def predict_landslide(rainfall, state):
+def predict_landslide(rainfall, state,month):
     """
     Predicts the landslide probability and gives the final prediction.
     
@@ -108,23 +110,20 @@ def predict_landslide(rainfall, state):
     except ValueError:
         print(f" Invalid state name: '{state}'. Please provide a valid state.")
         return None, None
-    
-
+    # try:
+    #     month_num=month_map[month]
+    # except ValueError:
+    #     print(f'Invalid month')
     try:
-        input_data = pd.DataFrame([[rainfall, state_encoded]], columns=['RAINFALL', 'State_Encoded'])
-        input_data_scaled = scaler.transform(input_data)
+        month=int(month)
+        input_data = pd.DataFrame([[state_encoded,month,rainfall]], columns=['State_encoded','Month','RAINFALL'])
     except Exception as e:
         print(f" Error preparing or scaling input data: {e}")
         return None, None
     
-    try:
-        rf_prob = rf_model.predict_proba(input_data_scaled)[0][1]  
-        logreg_prob = logreg_model.predict_proba(input_data_scaled)[0][1]
+    try:  
+        prediction=model.predict_proba(input_data)[0][1]
     except Exception as e:
         print(f" Error during model prediction: {e}")
-        return None, None
-
-    final_prob = 0.6 * rf_prob + 0.4 * logreg_prob
-    
-    
-    return final_prob
+        return None, None   
+    return prediction

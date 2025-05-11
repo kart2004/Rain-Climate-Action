@@ -463,15 +463,16 @@ def landslide():
         location=request.form.get('location')
         rainfall=request.form.get('precipitation')
         final_prediction=request.form.get('final_prediction')
+        month=request.form.get('month')
     else:
         location=request.args.get('location')
         rainfall=request.args.get('precipitation')
         final_prediction=request.args.get('final_prediction')
-    
-    if not all([location, rainfall,final_prediction]):
+        month=request.args.get('month')
+    if not all([location, rainfall,final_prediction,month]):
         return render_template('error.html', error="Missing required parameters from initial form")
     
-    # print(f'Recevied {location} ,{rainfall} and {final_prediction}')
+    #print(f'Recevied {location} ,{rainfall} and {final_prediction} and {month}')
     try:
         return render_template('landslide_predict.html',location=location,final_prediction=final_prediction,precipitation=rainfall)
     except Exception as e:
@@ -613,22 +614,19 @@ def summary_results():
 
         # Now landslide_location is guaranteed to be defined
         try:
-            landslide_probability = predict_landslide(flood_precipitation, landslide_location.strip())
+            landslide_probability = predict_landslide(flood_precipitation, landslide_location.lower(),month_num)
             
             # Handle case where landslide_probability is a tuple instead of a number
             if isinstance(landslide_probability, tuple):
                 landslide_probability = 0
                 
-            if landslide_probability >= 0.7:
+            if landslide_probability >= 0.6:
                 final_prediction = "Landslide risk exist"
                 landslide_summary = "Based on our analysis your area is under threat of a severe landslide, evacuative measures are suggested"
             elif landslide_probability > 0 and landslide_probability < 0.3:
                 final_prediction = "No landslide"
                 landslide_summary = "Based on our analysis there is no landslide risk for your area, you can relax and enjoy the weather"
-            elif landslide_probability >= 0.3 and landslide_probability < 0.5:
-                final_prediction = "Mild risk"
-                landslide_summary = "Based on our analysis there is a mild risk of landslide, stay updated with the latest news"
-            elif landslide_probability >= 0.5 and landslide_probability < 0.7:
+            elif landslide_probability >= 0.3 and landslide_probability < 0.6:
                 final_prediction = "Moderate risk"
                 landslide_summary = "Based on our analysis there is a moderate risk of landslide, be prepared"
             else:

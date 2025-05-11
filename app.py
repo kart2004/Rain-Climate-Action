@@ -6,6 +6,11 @@ import numpy as np
 import tensorflow as tf
 import sys
 import os
+
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppress TF logging
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Disable oneDNN custom operations
+
 # Import flood-related functionality
 from flood.flood import (
     get_state_and_terrain, 
@@ -25,6 +30,13 @@ from drought.drought import (
 from landslide.model import predict_landslide,states,city_to_state
 # Import configuration
 from flood.config import STATE_MAPPING, BING_API_KEY, OPENWEATHER_API_KEY
+
+#Import groundwater-related functionality
+from groundwater.groundwateranalysis import (
+    initialize_groundwater_data,
+    analyze_groundwater_risk,
+    get_risk_level
+)
 
 # Enable eager execution for TensorFlow
 tf.compat.v1.enable_eager_execution()
@@ -59,6 +71,7 @@ def grantaccess():
             'Chennai': 'TN',
             'Kolkata': 'WB',
             'Bengaluru': 'KA',
+            'Bangalore': 'KA',
             'Hyderabad': 'AD',
             'Ahmedabad': 'GJ',
             'Pune': 'MH',
@@ -158,14 +171,20 @@ def grantaccess():
         else:
             severity = "No Drought Risk"
             summary = "No significant drought risk detected. Continue normal water usage with conservation practices."
+
+        groundwater_data = analyze_groundwater_risk(state_code)
             
         return render_template('drought_predict.html',
                              location=location,
                              date=date,
                              precipitation=precipitation,
                              severity=severity,
-                             summary=summary)
-                             
+                             summary=summary,
+                             groundwater_risk=groundwater_data['risk_level'],
+                             groundwater_percentage=groundwater_data['risk_percentage'],
+                             groundwater_recharge=groundwater_data['recharge_rate'],
+                             groundwater_summary=groundwater_data['summary'])
+        
     except Exception as e:
         return render_template('error.html', error=f"Sorry, something went wrong: {str(e)}")
 
@@ -639,6 +658,17 @@ def summary_results():
             landslide_summary = "Unable to calculate landslide risk due to a technical issue"
             landslide_probability = 0
 
+        try:
+            groundwater_data = analyze_groundwater_risk(state_code)
+        except Exception as e:
+            print(f"Error in groundwater analysis: {str(e)}")
+            groundwater_data = {
+                'risk_level': "Analysis Unavailable",
+                'risk_percentage': 0,
+                'recharge_rate': 0,
+                'summary': "Unable to analyze groundwater risk due to technical issue"
+            }
+
         return render_template(
             'prediction_summary.html',
             location=city,  # Use city name from Bing Maps
@@ -661,7 +691,11 @@ def summary_results():
             state_code=state_code,
             landslide_probability=landslide_probability,
             landslide_prediction=final_prediction,
-            landslide_summary=landslide_summary
+            landslide_summary=landslide_summary,
+            groundwater_risk=groundwater_data['risk_level'],
+            groundwater_percentage=groundwater_data['risk_percentage'],
+            groundwater_recharge=groundwater_data['recharge_rate'],
+            groundwater_summary=groundwater_data['summary']
         )
         
     except Exception as e:
@@ -672,4 +706,5 @@ def summary_results():
 # Main entry point to run the Flask app
 if __name__ == "__main__":
     create_encoder_and_scaler()  # Optional: initialize encoders/scalers for flood prediction
+    initialize_groundwater_data()
     app.run(debug=True)

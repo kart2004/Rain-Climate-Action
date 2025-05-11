@@ -65,6 +65,14 @@
         .landslide-header {
             background: linear-gradient(to right, #8B4513, #D2691E, #A0522D);
         }
+
+        .groundwater-header {
+            background: linear-gradient(to right, #2193b0, #6dd5ed);
+        }
+        
+        .groundwater-bar {
+            background: linear-gradient(to right, #2193b0, #6dd5ed);
+        }
         
         .card-body {
             padding: 30px;
@@ -272,6 +280,30 @@
                             <input type="hidden" name="month" value="{{month}}">
                             <button type="submit" class="details-btn landslide-btn"> View Detailed landslide report </button>
                         </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Groundwater Analysis Card -->
+            <div class="col-lg-4 col-md-6">
+                <div class="prediction-card">
+                    <div class="card-header groundwater-header">
+                        <h3>Groundwater Analysis</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="location-info">
+                            <p><strong>Location:</strong> {{ location }}</p>
+                            <p><strong>Date:</strong> {{ month }} {{ year }}</p>
+                        </div>
+
+                        <h4>Groundwater Risk: {{ groundwater_risk }}</h4>
+                        <div class="severity-indicator">
+                            <div class="severity-bar groundwater-bar" style="width: {{ groundwater_percentage }}%;"></div>
+                        </div>
+
+                        <p><strong>Recharge Rate:</strong> {{ groundwater_recharge }} mm/year</p>
+                        <p>{{ groundwater_summary }}</p>
                     </div>
                 </div>
             </div>

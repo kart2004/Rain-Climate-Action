@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-Year Climate Forecast - {{ location }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/bootstrap.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/font-awesome.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/elegant-fonts.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/themify-icons.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/swiper.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .hero-content-wrap {
+            position: relative;
+            height: 40vh;
+            min-height: 300px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        .hero-content-wrap img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+        .hero-content-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2;
+        }
+        .entry-header h1 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        .entry-content p {
+            color: white;
+            font-size: 1.1rem;
+        }
+        .results-section {
+            margin-top: -2rem;
+            position: relative;
+            z-index: 3;
+        }
+        .chart-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease;
+        }
+        .chart-card:hover {
+            transform: translateY(-5px);
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 1rem 0;
+        }
+        .risk-indicator {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 0.25rem;
+        }
+        .risk-low { background-color: #d4edda; color: #155724; }
+        .risk-moderate { background-color: #fff3cd; color: #856404; }
+        .risk-high { background-color: #f8d7da; color: #721c24; }
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-slider">
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide hero-content-wrap">
+                    <img src="{{ url_for('static', filename='images/background.png') }}" alt="Climate Prediction Background">
+                    
+                    <div class="hero-content-overlay position-absolute w-100 h-100">
+                        <div class="container h-100">
+                            <div class="row h-100">
+                                <div class="col-12 col-lg-8 d-flex flex-column justify-content-center align-items-start">
+                                    <header class="entry-header">
+                                        <h1>5-Year Climate Forecast</h1>
+                                    </header>
+                                    
+                                    <div class="entry-content mt-4">
+                                        <p>Comprehensive predictions for {{ location }} ({{ current_year + 1 }} - {{ current_year + 5 }})</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container results-section">
+        <!-- Summary Card -->
+        <div class="summary-card">
+            <div class="row">
+                <div class="col-md-8">
+                    <h2><i class="fa fa-map-marker mr-2"></i>{{ location }}{% if state %}, {{ state }}{% endif %}</h2>
+                    <p class="mb-0">Comprehensive 5-year climate risk assessment and rainfall predictions</p>
+                    <small style="opacity: 0.8;">
+                        <i class="fa fa-info-circle mr-1"></i>
+                        Predictions use the same models and logic as immediate forecasts for consistency
+                    </small>
+                </div>
+                <div class="col-md-4 text-right">
+                    <a href="{{ url_for('long_term_predict') }}" class="btn btn-light">
+                        <i class="fa fa-refresh mr-2"></i>New Prediction
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-info" role="alert">
+            <strong>Note:</strong> The 5-year forecast uses the exact same prediction models and values as immediate predictions to ensure perfect consistency. 
+            The forecast shows how these same prediction values would apply over the next 5 years.
+        </div>
+
+        <!-- Rainfall Predictions Chart -->
+        <div class="chart-card">
+            <h3><i class="fa fa-cloud-rain mr-2"></i>Annual Rainfall Predictions</h3>
+            <div class="chart-container">
+                <canvas id="rainfallChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Disaster Risk Chart -->
+        <div class="chart-card">
+            <h3><i class="fa fa-exclamation-triangle mr-2"></i>Disaster Risk Likelihood</h3>
+            <div class="chart-container">
+                <canvas id="disasterChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Quarterly Rainfall Breakdown -->
+        <div class="chart-card">
+            <h3><i class="fa fa-calendar mr-2"></i>Quarterly Rainfall Patterns</h3>
+            <div class="chart-container">
+                <canvas id="quarterlyChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Risk Summary Table -->
+        <div class="chart-card">
+            <h3><i class="fa fa-table mr-2"></i>Risk Assessment Summary</h3>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Year</th>
+                            <th>Total Rainfall (mm)</th>
+                            <th>Flood Risk</th>
+                            <th>Drought Risk</th>
+                            <th>Landslide Risk</th>
+                            <th>Erosion Risk</th>
+                            <th>Groundwater Risk</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pred in predictions %}
+                        <tr>
+                            <td><strong>{{ pred.year }}</strong></td>
+                            <td>{{ "%.1f"|format(pred.rainfall.total) }}</td>
+                            <td>
+                                <span class="risk-indicator risk-{{ 'high' if pred.disasters.flood > 0.7 else 'moderate' if pred.disasters.flood > 0.3 else 'low' }}">
+                                    {{ "%.1f"|format(pred.disasters.flood * 100) }}%
+                                </span>
+                            </td>
+                            <td>
+                                <span class="risk-indicator risk-{{ 'high' if pred.disasters.drought > 0.7 else 'moderate' if pred.disasters.drought > 0.3 else 'low' }}">
+                                    {{ "%.1f"|format(pred.disasters.drought * 100) }}%
+                                </span>
+                            </td>
+                            <td>
+                                <span class="risk-indicator risk-{{ 'high' if pred.disasters.landslide > 0.7 else 'moderate' if pred.disasters.landslide > 0.3 else 'low' }}">
+                                    {{ "%.1f"|format(pred.disasters.landslide * 100) }}%
+                                </span>
+                            </td>
+                            <td>
+                                <span class="risk-indicator risk-{{ 'high' if pred.disasters.erosion > 0.7 else 'moderate' if pred.disasters.erosion > 0.3 else 'low' }}">
+                                    {{ "%.1f"|format(pred.disasters.erosion * 100) }}%
+                                </span>
+                            </td>
+                            <td>
+                                <span class="risk-indicator risk-{{ 'high' if pred.disasters.groundwater > 0.7 else 'moderate' if pred.disasters.groundwater > 0.3 else 'low' }}">
+                                    {{ "%.1f"|format(pred.disasters.groundwater * 100) }}%
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="text-center mb-4">
+            <a href="{{ url_for('index') }}" class="btn btn-primary mr-3">
+                <i class="fa fa-home mr-2"></i>Back to Home
+            </a>
+            <a href="{{ url_for('long_term_predict') }}" class="btn btn-outline-primary">
+                <i class="fa fa-search mr-2"></i>New Location
+            </a>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/swiper.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    <script>
+        // Prepare data for charts
+        const years = {{ predictions | map(attribute='year') | list | tojson }};
+        const rainfallData = {{ predictions | map(attribute='rainfall.total') | list | tojson }};
+        const quarterlyData = {
+            'Jan-Feb': {{ predictions | map(attribute='rainfall.Jan-Feb') | list | tojson }},
+            'Mar-May': {{ predictions | map(attribute='rainfall.Mar-May') | list | tojson }},
+            'Jun-Sep': {{ predictions | map(attribute='rainfall.Jun-Sep') | list | tojson }},
+            'Oct-Dec': {{ predictions | map(attribute='rainfall.Oct-Dec') | list | tojson }}
+        };
+        const disasterData = {
+            'Flood': {{ predictions | map(attribute='disasters.flood') | list | tojson }},
+            'Drought': {{ predictions | map(attribute='disasters.drought') | list | tojson }},
+            'Landslide': {{ predictions | map(attribute='disasters.landslide') | list | tojson }},
+            'Erosion': {{ predictions | map(attribute='disasters.erosion') | list | tojson }},
+            'Groundwater': {{ predictions | map(attribute='disasters.groundwater') | list | tojson }}
+        };
+
+        // Rainfall Chart
+        const rainfallCtx = document.getElementById('rainfallChart').getContext('2d');
+        new Chart(rainfallCtx, {
+            type: 'line',
+            data: {
+                labels: years,
+                datasets: [{
+                    label: 'Annual Rainfall (mm)',
+                    data: rainfallData,
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.1,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Predicted Annual Rainfall Trends'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Rainfall (mm)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Disaster Risk Chart
+        const disasterCtx = document.getElementById('disasterChart').getContext('2d');
+        new Chart(disasterCtx, {
+            type: 'bar',
+            data: {
+                labels: years,
+                datasets: [
+                    {
+                        label: 'Flood Risk',
+                        data: disasterData['Flood'],
+                        backgroundColor: 'rgba(255, 99, 132, 0.8)'
+                    },
+                    {
+                        label: 'Drought Risk',
+                        data: disasterData['Drought'],
+                        backgroundColor: 'rgba(255, 205, 86, 0.8)'
+                    },
+                    {
+                        label: 'Landslide Risk',
+                        data: disasterData['Landslide'],
+                        backgroundColor: 'rgba(54, 162, 235, 0.8)'
+                    },
+                    {
+                        label: 'Erosion Risk',
+                        data: disasterData['Erosion'],
+                        backgroundColor: 'rgba(75, 192, 192, 0.8)'
+                    },
+                    {
+                        label: 'Groundwater Risk',
+                        data: disasterData['Groundwater'],
+                        backgroundColor: 'rgba(153, 102, 255, 0.8)'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Disaster Risk Likelihood (0-1 scale)'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 1,
+                        title: {
+                            display: true,
+                            text: 'Risk Probability'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Quarterly Rainfall Chart
+        const quarterlyCtx = document.getElementById('quarterlyChart').getContext('2d');
+        new Chart(quarterlyCtx, {
+            type: 'radar',
+            data: {
+                labels: years,
+                datasets: [
+                    {
+                        label: 'Jan-Feb',
+                        data: quarterlyData['Jan-Feb'],
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)'
+                    },
+                    {
+                        label: 'Mar-May',
+                        data: quarterlyData['Mar-May'],
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)'
+                    },
+                    {
+                        label: 'Jun-Sep',
+                        data: quarterlyData['Jun-Sep'],
+                        borderColor: 'rgb(255, 205, 86)',
+                        backgroundColor: 'rgba(255, 205, 86, 0.2)'
+                    },
+                    {
+                        label: 'Oct-Dec',
+                        data: quarterlyData['Oct-Dec'],
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Quarterly Rainfall Distribution'
+                    }
+                },
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Rainfall (mm)'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, render_template, request
+from flask import Flask, redirect, url_for, render_template, request, session
 import requests
 import urllib
 from datetime import datetime
@@ -702,6 +702,247 @@ def summary_results():
         import traceback
         traceback.print_exc()
         return render_template('error.html', error=f"An error occurred: {str(e)}")
+
+@app.route('/long_term_predict', methods=['GET', 'POST'])
+def long_term_predict():
+    if request.method == 'POST':
+        try:
+            location = request.form.get('location')
+            
+            # Use Bing Maps API to validate and get location data (same as summary_results)
+            url = 'http://dev.virtualearth.net/REST/v1/Locations?'
+            key = BING_API_KEY
+            cr = 'IN'
+            results = url + urllib.parse.urlencode(({'CountryRegion': cr, 'locality': location, 'key': key}))
+            response = requests.get(results)
+            parser = response.json()
+            
+            if parser['statusDescription'] != 'OK':
+                return render_template('error.html', error="Could not retrieve location data. Please try again.")
+                
+            if 'adminDistrict' not in parser['resourceSets'][0]['resources'][0]['address']:
+                return render_template('error.html', error="Location does not exist in India! Please try again!")
+                
+            # Get state name from Bing Maps response
+            state = parser['resourceSets'][0]['resources'][0]['address']['adminDistrict']
+            city = parser['resourceSets'][0]['resources'][0]['address']['locality']
+            
+            # Find state code from state name (same as summary_results)
+            state_code = None
+            for code, details in STATE_MAPPING.items():
+                if details["full_name"].lower() == state.lower() or code.lower() == state.lower():
+                    state_code = code
+                    break
+                    
+            if not state_code:
+                return render_template('error.html', error=f"State '{state}' not found in our database. Please try another location.")
+            
+            # Get current year
+            current_year = datetime.now().year
+            
+            # Get state details for terrain
+            state_name, terrain = get_state_and_terrain(state_code)
+            
+            # Map Bing Maps state names to landslide model state names
+            def map_state_for_landslide(bing_state):
+                state_mapping = {
+                    'Delhi': 'Delhi',
+                    'Maharashtra': 'Maharashtra',
+                    'Tamil Nadu': 'Tamil Nadu',
+                    'West Bengal': 'West Bengal',
+                    'Karnataka': 'Karnataka',
+                    'Andhra Pradesh': 'Andhra Pradesh',
+                    'Gujarat': 'Gujarat',
+                    'Rajasthan': 'Rajasthan',
+                    'Uttar Pradesh': 'Uttar Pradesh',
+                    'Madhya Pradesh': 'Madhya Pradesh',
+                    'Bihar': 'Bihar',
+                    'Punjab': 'Punjab',
+                    'Haryana': 'Haryana',
+                    'Jammu and Kashmir': 'Jammu and Kashmir',
+                    'Jharkhand': 'Jharkhand',
+                    'Kerala': 'Kerala',
+                    'Assam': 'Assam',
+                    'Chhattisgarh': 'Chhattisgarh',
+                    'Chandigarh': 'Chandigarh',
+                    'Odisha': 'Odisha',
+                    'Uttarakhand': 'Uttarakhand',
+                    'Telangana': 'Telangana',
+                    'Himachal Pradesh': 'Himachal Pradesh',
+                    'Tripura': 'Tripura',
+                    'Manipur': 'Manipur',
+                    'Meghalaya': 'Meghalaya',
+                    'Nagaland': 'Nagaland',
+                    'Arunachal Pradesh': 'Arunachal Pradesh',
+                    'Mizoram': 'Mizoram',
+                    'Sikkim': 'Sikkim',
+                    'Goa': 'Goa',
+                    'Lakshadweep': 'Lakshadweep',
+                    'Andaman and Nicobar Islands': 'Andaman and Nicobar Islands',
+                    'Dadra and Nagar Haveli': 'Gujarat',
+                    'Daman and Diu': 'Gujarat',
+                    'Puducherry': 'Tamil Nadu'
+                }
+                return state_mapping.get(bing_state, bing_state)
+            
+            landslide_state = map_state_for_landslide(state)
+            
+            # Generate predictions for next 5 years using the exact same rainfall prediction logic
+            predictions = []
+            for year in range(current_year + 1, current_year + 6):
+                # Initialize year_predictions dictionary
+                year_predictions = {
+                    'year': year,
+                    'rainfall': {},
+                    'disasters': {}
+                }
+                
+                # Use the EXACT same rainfall prediction logic as summary_results
+                # Get month details (using May as default month for consistency)
+                month_num = "05"  # May
+                quarter, duration = get_month_details(month_num)
+                month_name = "May"
+                
+                # Get state details (exact same as summary_results)
+                state_name, terrain = get_state_and_terrain(state_code)
+                
+                # Get the EXACT same rainfall prediction as summary_results
+                flood_precipitation = get_rainfall_data(state_code, quarter)
+                
+                # Use the EXACT same flood prediction logic as summary_results
+                flood_severity = predict_flood_severity(state_name, flood_precipitation, terrain)
+                
+                # Use the EXACT same drought prediction logic as summary_results (using same rainfall)
+                drought_severity = predict_drought(city, str(year), month_name, flood_precipitation)
+                
+                # Use the EXACT same landslide prediction logic as summary_results (using same rainfall)
+                landslide_location = city
+                if city not in states:
+                    state_code_for_landslide = city_to_state.get(city)
+                    if state_code_for_landslide:
+                        state_name_for_landslide, _ = get_state_and_terrain(state_code_for_landslide)
+                        if state_name_for_landslide.title() in states:
+                            landslide_location = state_name_for_landslide.strip().title()
+                        else:
+                            found_match = False
+                            for state_in_list in states:
+                                if state_in_list in state_name_for_landslide.strip().title():
+                                    landslide_location = state_in_list
+                                    found_match = True
+                                    break
+                            if not found_match:
+                                landslide_location = city
+                    else:
+                        landslide_location = city
+                
+                try:
+                    landslide_probability = predict_landslide(flood_precipitation, landslide_location.lower(), month_num)
+                    if isinstance(landslide_probability, tuple):
+                        landslide_probability = 0
+                except Exception as e:
+                    print(f"Error in landslide prediction: {e}")
+                    landslide_probability = 0
+                
+                # Get groundwater data (exact same as summary_results)
+                try:
+                    groundwater_data = analyze_groundwater_risk(state_code)
+                except Exception as e:
+                    print(f"Error in groundwater analysis: {e}")
+                    groundwater_data = {
+                        'risk_level': "Analysis Unavailable",
+                        'risk_percentage': 0,
+                        'recharge_rate': 0,
+                        'summary': "Unable to analyze groundwater risk due to technical issue"
+                    }
+                
+                # Store rainfall data (use the same rainfall prediction for all quarters for consistency)
+                quarters = ['Jan-Feb', 'Mar-May', 'Jun-Sep', 'Oct-Dec']
+                total_rainfall = 0
+                for q in quarters:
+                    rainfall = get_rainfall_data(state_code, q)
+                    if rainfall is None or not isinstance(rainfall, (int, float)) or rainfall < 0:
+                        rainfall = 0.0
+                    year_predictions['rainfall'][q] = rainfall
+                    total_rainfall += rainfall
+                
+                if total_rainfall is None or not isinstance(total_rainfall, (int, float)) or total_rainfall < 0:
+                    total_rainfall = 0.0
+                year_predictions['rainfall']['total'] = total_rainfall
+                
+                # Use the EXACT same probability conversion as summary_results
+                # Flood probability (convert severity to percentage, then to 0-1)
+                if flood_severity == 0:
+                    flood_prob = 0.1
+                elif flood_severity == 1:
+                    flood_prob = 0.3
+                elif flood_severity == 2:
+                    flood_prob = 0.5
+                elif flood_severity == 3:
+                    flood_prob = 0.7
+                elif flood_severity == 4:
+                    flood_prob = 0.85
+                elif flood_severity == 5:
+                    flood_prob = 1.0
+                else:
+                    flood_prob = 0.0
+                
+                # Drought probability (convert severity text to percentage, then to 0-1)
+                if drought_severity == "No Drought":
+                    drought_prob = 0.1
+                elif drought_severity == "Mild Drought":
+                    drought_prob = 0.4
+                elif drought_severity == "Moderate Drought":
+                    drought_prob = 0.7
+                elif drought_severity == "Severe Drought":
+                    drought_prob = 1.0
+                else:
+                    drought_prob = 0.0
+                
+                # Landslide probability (use raw probability from model)
+                landslide_prob = landslide_probability if landslide_probability is not None else 0.0
+                
+                # Erosion probability (calculate from R-factor using same rainfall)
+                try:
+                    erosion_r_factor = predict_r_factor(state, year, flood_precipitation)
+                    if erosion_r_factor is None or not isinstance(erosion_r_factor, (int, float)):
+                        erosion_prob = 0.0
+                    else:
+                        erosion_prob = min(erosion_r_factor / 1000, 1.0)
+                except Exception as e:
+                    print(f"Error in erosion prediction: {e}")
+                    erosion_prob = 0.0
+                
+                # Groundwater probability (use percentage from analysis)
+                groundwater_prob = groundwater_data['risk_percentage'] / 100.0 if groundwater_data['risk_percentage'] is not None else 0.0
+                
+                # Store all disaster probabilities
+                year_predictions['disasters'] = {
+                    'flood': flood_prob,
+                    'drought': drought_prob,
+                    'landslide': landslide_prob,
+                    'erosion': erosion_prob,
+                    'groundwater': groundwater_prob
+                }
+                
+                # Final validation: ensure all probabilities are valid numbers
+                for disaster_type, prob in year_predictions['disasters'].items():
+                    if prob is None or not isinstance(prob, (int, float)) or prob < 0:
+                        year_predictions['disasters'][disaster_type] = 0.0
+                    elif prob > 1.0:
+                        year_predictions['disasters'][disaster_type] = 1.0
+                
+                predictions.append(year_predictions)
+            
+            return render_template('long_term_predict.html', 
+                                 location=city, 
+                                 state=state,
+                                 predictions=predictions,
+                                 current_year=current_year)
+        
+        except Exception as e:
+            return render_template('error.html', error=f"Error generating long-term predictions: {str(e)}")
+    
+    return render_template('long_term_form.html')
 
 # Main entry point to run the Flask app
 if __name__ == "__main__":

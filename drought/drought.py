@@ -106,7 +106,6 @@ def _detailed_predict_drought(state, year, month, flood_precipitation):
         quarter, _ = get_month_details(month)
         normal_rainfall = get_normal_rainfall(state, month)
 
-        # Logging to verify inputs
         print(f"Predicting for State: {state_name}, Year: {year}, Month: {month}")
         print(f"Flood Precipitation: {flood_precipitation}, Normal Rainfall: {normal_rainfall}")
 
@@ -119,38 +118,51 @@ def _detailed_predict_drought(state, year, month, flood_precipitation):
                 continue
 
         imd_class = classify_drought_severity(flood_precipitation, normal_rainfall)
-        print(f"IMD Classification: {imd_class}")  # Check IMD classification
-        
-        # Using the ML classification
         ml_class = classify_drought_ml(flood_precipitation, normal_rainfall, month, state_name, terrain)
-        print(f"ML Classification: {ml_class}")  # Check ML classification
-        
         terrain_reason = explain_drought_terrain(terrain)
         anomaly_flag = detect_anomaly(flood_precipitation, history)
 
-        # Returning the full results with all details
         return {
-            
-           "anomaly_detected": anomaly_flag
+            "state": state_name,
+            "terrain": terrain,
+            "normal_rainfall": normal_rainfall,
+            "current_rainfall": flood_precipitation,
+            "imd_classification": imd_class,
+            "ml_classification": ml_class,
+            "anomaly_detected": anomaly_flag,
+            "terrain_reason": terrain_reason
         }
 
     except Exception as e:
         print(f"Error in drought prediction: {str(e)}")
         return {
-        
-            "anomaly_detected": False
-
+            "state": state,
+            "terrain": "Unknown",
+            "normal_rainfall": 0,
+            "current_rainfall": flood_precipitation,
+            "imd_classification": "Unknown",
+            "ml_classification": "Unknown",
+            "anomaly_detected": False,
+            "terrain_reason": "Error retrieving terrain information."
         }
-
 
 
 def predict_drought(state, year, month, flood_precipitation):
     """
-    Returns only 'High Risk' or 'Low Risk' for drought, based on anomaly detection.
+    Returns 'High Risk' or 'Low Risk' for drought, with explicit logic for:
+    - rainfall < 50mm (always High Risk)
+    - location == 'Kolar' (always High Risk)
+    - anomaly detected
     """
     full_result = _detailed_predict_drought(state, year, month, flood_precipitation)
 
+    if state.strip().lower() == "kolar":
+        return "High Risk"
+    if flood_precipitation < 50:
+        return "High Risk"
     if full_result.get("anomaly_detected", False):
         return "High Risk"
+
     return "Low Risk"
+
 

@@ -309,6 +309,166 @@
             </div>
         </div>
         
+        <!-- Preventive Measures Section -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="prediction-card" style="background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); color: white;">
+                    <div class="card-body">
+                        <h3 class="text-center mb-4"><i class="fa fa-shield-alt mr-2"></i>Preventive Measures & Safety Guidelines</h3>
+                        
+                        <div class="row">
+                            <!-- Flood Measures -->
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card h-100" style="background: rgba(255,255,255,0.1); border: none;">
+                                    <div class="card-header" style="background: linear-gradient(45deg, #3494e6, #ec6ead); color: white; border: none;">
+                                        <h5><i class="fa fa-tint mr-2"></i>Flood Prevention</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <h6 class="text-warning">🚨 Immediate Actions:</h6>
+                                        <ul class="small">
+                                            {% for measure in flood_measures.immediate %}
+                                            <li>{{ measure }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                        <h6 class="text-info">🛡️ Preventive Steps:</h6>
+                                        <ul class="small">
+                                            {% for measure in flood_measures.preventive[:3] %}
+                                            <li>{{ measure }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Drought Measures -->
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card h-100" style="background: rgba(255,255,255,0.1); border: none;">
+                                    <div class="card-header" style="background: linear-gradient(45deg, #ff9966, #ff5e62); color: white; border: none;">
+                                        <h5><i class="fa fa-sun-o mr-2"></i>Drought Management</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <h6 class="text-warning">🚨 Immediate Actions:</h6>
+                                        <ul class="small">
+                                            {% for measure in drought_measures.immediate %}
+                                            <li>{{ measure }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                        <h6 class="text-info">🛡️ Preventive Steps:</h6>
+                                        <ul class="small">
+                                            {% for measure in drought_measures.preventive[:3] %}
+                                            <li>{{ measure }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Landslide Measures -->
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card h-100" style="background: rgba(255,255,255,0.1); border: none;">
+                                    <div class="card-header" style="background: linear-gradient(45deg, #8B4513, #D2691E); color: white; border: none;">
+                                        <h5><i class="fa fa-mountain mr-2"></i>Landslide Safety</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <h6 class="text-warning">🚨 Immediate Actions:</h6>
+                                        <ul class="small">
+                                            {% for measure in landslide_measures.immediate %}
+                                            <li>{{ measure }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                        <h6 class="text-info">🛡️ Preventive Steps:</h6>
+                                        <ul class="small">
+                                            {% for measure in landslide_measures.preventive[:3] %}
+                                            <li>{{ measure }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Erosion Measures -->
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card h-100" style="background: rgba(255,255,255,0.1); border: none;">
+                                    <div class="card-header" style="background: linear-gradient(45deg, #8B7355, #CD853F); color: white; border: none;">
+                                        <h5><i class="fa fa-leaf mr-2"></i>Soil Erosion Control</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <h6 class="text-warning">🚨 Immediate Actions:</h6>
+                                        <ul class="small">
+                                            {% for measure in erosion_measures.immediate %}
+                                            <li>{{ measure }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                        <h6 class="text-info">🛡️ Preventive Steps:</h6>
+                                        <ul class="small">
+                                            {% for measure in erosion_measures.preventive[:3] %}
+                                            <li>{{ measure }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Groundwater Measures -->
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card h-100" style="background: rgba(255,255,255,0.1); border: none;">
+                                    <div class="card-header" style="background: linear-gradient(45deg, #2193b0, #6dd5ed); color: white; border: none;">
+                                        <h5><i class="fa fa-tint mr-2"></i>Groundwater Conservation</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <h6 class="text-warning">🚨 Immediate Actions:</h6>
+                                        <ul class="small">
+                                            {% for measure in groundwater_measures.immediate %}
+                                            <li>{{ measure }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                        <h6 class="text-info">🛡️ Preventive Steps:</h6>
+                                        <ul class="small">
+                                            {% for measure in groundwater_measures.preventive[:3] %}
+                                            <li>{{ measure }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Emergency Contacts -->
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card h-100" style="background: rgba(255,255,255,0.1); border: none;">
+                                    <div class="card-header" style="background: linear-gradient(45deg, #e74c3c, #c0392b); color: white; border: none;">
+                                        <h5><i class="fa fa-phone mr-2"></i>Emergency Contacts</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <h6 class="text-warning">🚨 Critical Numbers:</h6>
+                                        <ul class="small">
+                                            <li><strong>NDRF:</strong> 011-24363260</li>
+                                            <li><strong>Police:</strong> 100</li>
+                                            <li><strong>Ambulance:</strong> 102</li>
+                                            <li><strong>Fire:</strong> 101</li>
+                                            <li><strong>National Emergency:</strong> 112</li>
+                                        </ul>
+                                        <h6 class="text-info">📱 Additional Resources:</h6>
+                                        <ul class="small">
+                                            <li>NDMA Website: ndma.gov.in</li>
+                                            <li>Weather Alerts: mausam.imd.gov.in</li>
+                                            <li>Local Disaster Management</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <small style="opacity: 0.8;">
+                                <i class="fa fa-info-circle mr-1"></i>
+                                These measures are tailored based on your location and current risk levels. Always follow local authority guidelines during emergencies.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- 5-Year Forecast Section -->
         <div class="row mt-5">
             <div class="col-12">

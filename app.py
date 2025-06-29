@@ -670,6 +670,23 @@ def summary_results():
                 'summary': "Unable to analyze groundwater risk due to technical issue"
             }
 
+        # Get preventive measures for each disaster type
+        flood_measures = get_preventive_measures('flood', flood_severity, city, state_code)
+        drought_measures = get_preventive_measures('drought', drought_severity, city, state_code)
+        landslide_measures = get_preventive_measures('landslide', final_prediction, city, state_code)
+        
+        # Calculate erosion severity for preventive measures
+        try:
+            erosion_r_factor = predict_r_factor(state, year, flood_precipitation)
+            erosion_severity = min(erosion_r_factor / 1000, 1.0) if erosion_r_factor else 0.0
+        except:
+            erosion_severity = 0.0
+        erosion_measures = get_preventive_measures('erosion', erosion_severity, city, state_code)
+        
+        # Calculate groundwater severity for preventive measures
+        groundwater_severity = groundwater_data['risk_percentage'] / 100.0 if groundwater_data['risk_percentage'] else 0.0
+        groundwater_measures = get_preventive_measures('groundwater', groundwater_severity, city, state_code)
+
         return render_template(
             'prediction_summary.html',
             location=city,  # Use city name from Bing Maps
@@ -696,7 +713,12 @@ def summary_results():
             groundwater_risk=groundwater_data['risk_level'],
             groundwater_percentage=groundwater_data['risk_percentage'],
             groundwater_recharge=groundwater_data['recharge_rate'],
-            groundwater_summary=groundwater_data['summary']
+            groundwater_summary=groundwater_data['summary'],
+            flood_measures=flood_measures,
+            drought_measures=drought_measures,
+            landslide_measures=landslide_measures,
+            erosion_measures=erosion_measures,
+            groundwater_measures=groundwater_measures
         )
         
     except Exception as e:
@@ -965,6 +987,259 @@ def long_term_predict():
             return render_template('error.html', error=f"Error generating long-term predictions: {str(e)}")
     
     return render_template('long_term_form.html')
+
+def get_preventive_measures(disaster_type, severity, location, state_code):
+    """Generate region-specific preventive measures for different disaster types."""
+    
+    if disaster_type == 'flood':
+        if severity in [4, 5]:
+            return {
+                'immediate': [
+                    "🚨 EVACUATE IMMEDIATELY: Move to higher ground",
+                    "📱 Keep emergency contacts ready: NDRF (011-24363260)",
+                    "🔋 Charge all devices and keep portable chargers ready",
+                    "📦 Pack essential documents, medicines, and emergency supplies",
+                    "🏠 Secure your property: Move valuables to upper floors"
+                ],
+                'preventive': [
+                    "🏗️ Install flood barriers and waterproofing",
+                    "🌊 Clear drainage systems and remove debris",
+                    "📡 Subscribe to weather alerts and flood warnings",
+                    "🏘️ Consider flood-resistant construction methods",
+                    "💧 Install sump pumps and backflow valves"
+                ],
+                'long_term': [
+                    "🌱 Plant flood-resistant vegetation",
+                    "🏛️ Support community flood management programs",
+                    "📊 Participate in local flood mapping",
+                    "🔧 Regular maintenance of drainage infrastructure",
+                    "📚 Educate community about flood preparedness"
+                ]
+            }
+        elif severity in [2, 3]:
+            return {
+                'immediate': [
+                    "⚠️ Stay alert and monitor weather updates",
+                    "📱 Keep emergency numbers handy",
+                    "🔋 Ensure devices are charged",
+                    "📦 Prepare emergency kit with essentials",
+                    "🏠 Check drainage around your property"
+                ],
+                'preventive': [
+                    "🌊 Clear nearby drains and gutters",
+                    "📡 Sign up for weather alerts",
+                    "🏗️ Consider flood-proofing measures",
+                    "💧 Install water sensors",
+                    "📱 Download emergency apps"
+                ],
+                'long_term': [
+                    "🌱 Maintain proper drainage systems",
+                    "🏛️ Support local flood management",
+                    "📊 Stay informed about flood risks",
+                    "🔧 Regular property maintenance",
+                    "📚 Learn about flood safety"
+                ]
+            }
+        else:
+            return {
+                'immediate': ["✅ No immediate action required"],
+                'preventive': [
+                    "🌊 Maintain good drainage practices",
+                    "📡 Stay informed about weather patterns",
+                    "🏠 Regular property maintenance",
+                    "💧 Monitor local water levels",
+                    "📱 Keep emergency contacts updated"
+                ],
+                'long_term': [
+                    "🌱 Support environmental conservation",
+                    "🏛️ Participate in community planning",
+                    "📊 Stay updated on climate patterns",
+                    "🔧 Maintain infrastructure",
+                    "📚 Continue flood awareness"
+                ]
+            }
+    
+    elif disaster_type == 'drought':
+        if severity == "Severe Drought":
+            return {
+                'immediate': [
+                    "🚨 CRITICAL WATER CONSERVATION: Implement strict water rationing",
+                    "💧 Prioritize drinking water over other uses",
+                    "🌱 Stop non-essential water activities",
+                    "🏭 Contact local authorities for water supply schedules",
+                    "📱 Report water wastage to authorities"
+                ],
+                'preventive': [
+                    "🌧️ Install rainwater harvesting systems",
+                    "💧 Use water-efficient appliances and fixtures",
+                    "🌱 Plant drought-resistant crops and vegetation",
+                    "🏗️ Implement greywater recycling systems",
+                    "📊 Monitor water usage and set conservation goals"
+                ],
+                'long_term': [
+                    "🌱 Support sustainable agriculture practices",
+                    "🏛️ Advocate for water conservation policies",
+                    "💧 Invest in water infrastructure improvements",
+                    "📚 Educate community about water conservation",
+                    "🌿 Promote native, drought-resistant landscaping"
+                ]
+            }
+        else:
+            return {
+                'immediate': ["✅ Normal water usage patterns"],
+                'preventive': [
+                    "💧 Practice water conservation habits",
+                    "🌱 Use water-efficient practices",
+                    "🏠 Regular maintenance of water systems",
+                    "📊 Monitor water usage patterns",
+                    "🌿 Maintain water-wise landscaping"
+                ],
+                'long_term': [
+                    "🌱 Support sustainable water management",
+                    "🏛️ Participate in water conservation programs",
+                    "💧 Invest in water-efficient technologies",
+                    "📚 Stay informed about water resources",
+                    "🌿 Promote water conservation awareness"
+                ]
+            }
+    
+    elif disaster_type == 'landslide':
+        if severity in ["Landslide risk exist", "Moderate risk"]:
+            return {
+                'immediate': [
+                    "🚨 EVACUATE IF IN HILLY AREAS: Move to stable ground immediately",
+                    "📱 Contact emergency services: NDRF (011-24363260)",
+                    "🏠 Avoid areas with loose soil or steep slopes",
+                    "📡 Monitor weather and geological alerts",
+                    "🚗 Plan evacuation routes to safer areas"
+                ],
+                'preventive': [
+                    "🌲 Plant deep-rooted vegetation for slope stability",
+                    "🏗️ Install retaining walls and slope stabilization",
+                    "💧 Proper drainage systems to prevent water accumulation",
+                    "📊 Regular geological assessments",
+                    "🏠 Avoid construction on steep slopes"
+                ],
+                'long_term': [
+                    "🌱 Support slope stabilization programs",
+                    "🏛️ Advocate for proper land-use planning",
+                    "📚 Educate community about landslide risks",
+                    "🔧 Regular maintenance of slope protection",
+                    "📊 Participate in geological monitoring"
+                ]
+            }
+        else:
+            return {
+                'immediate': ["✅ No immediate landslide risk"],
+                'preventive': [
+                    "🌲 Maintain vegetation cover on slopes",
+                    "🏗️ Regular inspection of slopes and retaining walls",
+                    "💧 Ensure proper drainage systems",
+                    "📊 Monitor slope stability",
+                    "🏠 Avoid disturbing natural slopes"
+                ],
+                'long_term': [
+                    "🌱 Support environmental conservation",
+                    "🏛️ Participate in land-use planning",
+                    "📚 Stay informed about geological risks",
+                    "🔧 Maintain slope protection measures",
+                    "📊 Regular geological assessments"
+                ]
+            }
+    
+    elif disaster_type == 'erosion':
+        if severity > 0.7:
+            return {
+                'immediate': [
+                    "🚨 HIGH EROSION RISK: Implement immediate soil protection",
+                    "🌱 Cover exposed soil with vegetation or mulch",
+                    "💧 Divert water flow away from vulnerable areas",
+                    "🏗️ Install temporary erosion barriers",
+                    "📱 Contact local agricultural extension services"
+                ],
+                'preventive': [
+                    "🌿 Plant erosion-resistant vegetation",
+                    "🏗️ Build terraces and contour barriers",
+                    "💧 Implement proper drainage systems",
+                    "🌱 Use cover crops and crop rotation",
+                    "📊 Regular soil erosion monitoring"
+                ],
+                'long_term': [
+                    "🌱 Support sustainable agriculture practices",
+                    "🏛️ Advocate for soil conservation policies",
+                    "📚 Educate about soil erosion prevention",
+                    "🔧 Maintain erosion control structures",
+                    "📊 Participate in soil conservation programs"
+                ]
+            }
+        else:
+            return {
+                'immediate': ["✅ Low erosion risk - maintain current practices"],
+                'preventive': [
+                    "🌱 Practice soil conservation methods",
+                    'Maintain vegetation cover',
+                    "💧 Proper water management",
+                    "🏗️ Regular soil structure maintenance",
+                    "📊 Monitor soil health indicators"
+                ],
+                'long_term': [
+                    "🌱 Support sustainable land management",
+                    "🏛️ Participate in soil conservation programs",
+                    "📚 Learn about soil health practices",
+                    "🔧 Maintain soil protection measures",
+                    "📊 Regular soil quality assessments"
+                ]
+            }
+    
+    elif disaster_type == 'groundwater':
+        if severity > 0.7:
+            return {
+                'immediate': [
+                    "🚨 CRITICAL GROUNDWATER DEPLETION: Reduce water extraction immediately",
+                    "💧 Implement strict water conservation measures",
+                    "🏭 Contact local water authorities for guidance",
+                    "📱 Report illegal groundwater extraction",
+                    "🌱 Stop non-essential water activities"
+                ],
+                'preventive': [
+                    "🌧️ Install comprehensive rainwater harvesting",
+                    "💧 Use water-efficient irrigation systems",
+                    "🌱 Plant drought-resistant crops",
+                    "🏗️ Implement artificial recharge systems",
+                    "📊 Monitor groundwater levels regularly"
+                ],
+                'long_term': [
+                    "🌱 Support sustainable water management",
+                    "🏛️ Advocate for groundwater protection policies",
+                    "💧 Invest in water infrastructure improvements",
+                    "📚 Educate about groundwater conservation",
+                    "🌿 Promote water-efficient practices"
+                ]
+            }
+        else:
+            return {
+                'immediate': ["✅ Normal groundwater usage patterns"],
+                'preventive': [
+                    "💧 Practice water conservation",
+                    "🌧️ Install basic rainwater harvesting",
+                    "🌱 Use water-efficient practices",
+                    "🏗️ Regular water system maintenance",
+                    "📊 Monitor water usage patterns"
+                ],
+                'long_term': [
+                    "🌱 Support sustainable water management",
+                    "🏛️ Participate in water conservation programs",
+                    "💧 Invest in water-efficient technologies",
+                    "📚 Stay informed about water resources",
+                    "🌿 Promote water conservation awareness"
+                ]
+            }
+    
+    return {
+        'immediate': ["✅ No immediate action required"],
+        'preventive': ["📚 Stay informed about disaster risks"],
+        'long_term': ["🌱 Support environmental conservation"]
+    }
 
 # Main entry point to run the Flask app
 if __name__ == "__main__":

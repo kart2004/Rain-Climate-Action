@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Drought Prediction</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/bootstrap.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/font-awesome.min.css') }}">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,7 +17,7 @@
         }
         .container {
             padding: 40px;
-            max-width: 800px;
+            max-width: 1200px;
             margin: auto;
             background-color: rgba(0, 0, 0, 0.6);
             border-radius: 10px;
@@ -24,9 +26,63 @@
             font-size: 2.5rem;
             margin-bottom: 20px;
         }
+        .measures-section {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .measure-card {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #ff9966;
+        }
+        .emergency-card {
+            background: rgba(220, 53, 69, 0.2);
+            border-left: 4px solid #dc3545;
+        }
+        .preventive-card {
+            background: rgba(40, 167, 69, 0.2);
+            border-left: 4px solid #28a745;
+        }
+        .long-term-card {
+            background: rgba(0, 123, 255, 0.2);
+            border-left: 4px solid #007bff;
+        }
         ul {
-            list-style-type: square;
+            list-style-type: none;
+            padding-left: 0;
+        }
+        li {
+            margin-bottom: 8px;
             padding-left: 20px;
+            position: relative;
+        }
+        li:before {
+            content: "•";
+            color: #ff9966;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        .btn-custom {
+            background: linear-gradient(45deg, #ff9966, #ff5e62);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 94, 98, 0.4);
+            color: white;
+            text-decoration: none;
         }
     </style>
 </head>
@@ -37,23 +93,85 @@
             <h1>⚠️ High Risk of Drought</h1>
             <p>The predicted precipitation is <strong>{{ precipitation }} mm</strong>, indicating a high risk of drought in {{ location }} during {{ display_month }} {{ year }}.</p>
 
-            <h2>💡 Preventive Measures:</h2>
-            <ul>
-                <li>Promote water conservation through efficient irrigation techniques.</li>
-                <li>Encourage rainwater harvesting and groundwater recharge.</li>
-                <li>Support drought-resilient crops and farming practices.</li>
-                <li>Enhance weather monitoring and early warning systems.</li>
-                <li>Educate communities on sustainable water usage.</li>
-            </ul>
+            <div class="measures-section">
+                <h2>🚨 Immediate Actions Required:</h2>
+                <div class="measure-card emergency-card">
+                    <ul>
+                        <li>Implement strict water rationing and conservation measures</li>
+                        <li>Prioritize drinking water over other uses</li>
+                        <li>Stop non-essential water activities (lawn watering, car washing)</li>
+                        <li>Contact local authorities for water supply schedules</li>
+                        <li>Report water wastage to authorities immediately</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="measures-section">
+                <h2>🛡️ Preventive Measures:</h2>
+                <div class="measure-card preventive-card">
+                    <ul>
+                        <li>Install rainwater harvesting systems</li>
+                        <li>Use water-efficient appliances and fixtures</li>
+                        <li>Plant drought-resistant crops and vegetation</li>
+                        <li>Implement greywater recycling systems</li>
+                        <li>Monitor water usage and set conservation goals</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="measures-section">
+                <h2>🌱 Long-term Solutions:</h2>
+                <div class="measure-card long-term-card">
+                    <ul>
+                        <li>Support sustainable agriculture practices</li>
+                        <li>Advocate for water conservation policies</li>
+                        <li>Invest in water infrastructure improvements</li>
+                        <li>Educate community about water conservation</li>
+                        <li>Promote native, drought-resistant landscaping</li>
+                    </ul>
+                </div>
+            </div>
         {% else %}
-            <h1>🌿 Hooray!! Low Risk of Drought</h1>
+            <h1>🌿 Low Risk of Drought</h1>
             <p>The predicted precipitation is <strong>{{ precipitation }} mm</strong>, which indicates a low risk of drought in {{ location }} during {{ display_month }} {{ year }}.</p>
             
-            <h2>📊 Anomaly Check</h2>
-            <ul>
-                <li><strong>Anomaly Detected:</strong> {{ 'Yes' if anomaly else 'No' }}</li>
-            </ul>
+            <div class="measures-section">
+                <h2>📊 Anomaly Check</h2>
+                <ul>
+                    <li><strong>Anomaly Detected:</strong> {{ 'Yes' if anomaly else 'No' }}</li>
+                </ul>
+            </div>
+
+            <div class="measures-section">
+                <h2>💧 Recommended Water Conservation Practices:</h2>
+                <div class="measure-card preventive-card">
+                    <ul>
+                        <li>Practice water conservation habits daily</li>
+                        <li>Use water-efficient practices in daily activities</li>
+                        <li>Regular maintenance of water systems</li>
+                        <li>Monitor water usage patterns</li>
+                        <li>Maintain water-wise landscaping</li>
+                    </ul>
+                </div>
+            </div>
         {% endif %}
+
+        <div class="measures-section">
+            <h2>📞 Emergency Contacts:</h2>
+            <div class="measure-card">
+                <ul>
+                    <li><strong>National Emergency:</strong> 112</li>
+                    <li><strong>Local Water Authority:</strong> Check your local directory</li>
+                    <li><strong>Agricultural Extension:</strong> Contact local agriculture office</li>
+                    <li><strong>Weather Updates:</strong> mausam.imd.gov.in</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <a href="{{ url_for('index') }}" class="btn-custom">Return to Home</a>
+            <a href="{{ url_for('summary_results') }}" class="btn-custom">View Complete Analysis</a>
+        </div>
     </div>
 </body>
 </html>

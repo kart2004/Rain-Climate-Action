@@ -6,6 +6,7 @@ import numpy as np
 import tensorflow as tf
 import sys
 import os
+import random
 
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppress TF logging
@@ -858,16 +859,25 @@ def long_term_predict():
                 # Store rainfall data (use the same rainfall prediction for all quarters for consistency)
                 quarters = ['Jan-Feb', 'Mar-May', 'Jun-Sep', 'Oct-Dec']
                 total_rainfall = 0
+                
+                # Add minor variation based on year (smaller variations for earlier years, larger for later years)
+                year_variation_factor = (year - current_year) * 0.05  # 5% variation per year
+                
                 for q in quarters:
                     rainfall = get_rainfall_data(state_code, q)
                     if rainfall is None or not isinstance(rainfall, (int, float)) or rainfall < 0:
                         rainfall = 0.0
-                    year_predictions['rainfall'][q] = rainfall
+                    
+                    # Add small random variation (±2-8% depending on year)
+                    variation = random.uniform(-0.02 - year_variation_factor, 0.02 + year_variation_factor)
+                    rainfall = rainfall * (1 + variation)
+                    
+                    year_predictions['rainfall'][q] = max(0, rainfall)  # Ensure non-negative
                     total_rainfall += rainfall
                 
                 if total_rainfall is None or not isinstance(total_rainfall, (int, float)) or total_rainfall < 0:
                     total_rainfall = 0.0
-                year_predictions['rainfall']['total'] = total_rainfall
+                year_predictions['rainfall']['total'] = max(0, total_rainfall)
                 
                 # Use the EXACT same probability conversion as summary_results
                 # Flood probability (convert severity to percentage, then to 0-1)
@@ -923,6 +933,18 @@ def long_term_predict():
                     'erosion': erosion_prob,
                     'groundwater': groundwater_prob
                 }
+                
+                # Add minor variations to disaster probabilities based on year
+                year_variation_factor = (year - current_year) * 0.03  # 3% variation per year
+                
+                for disaster_type in year_predictions['disasters']:
+                    current_prob = year_predictions['disasters'][disaster_type]
+                    if current_prob is not None and isinstance(current_prob, (int, float)):
+                        # Add small random variation (±1-4% depending on year)
+                        variation = random.uniform(-0.01 - year_variation_factor, 0.01 + year_variation_factor)
+                        new_prob = current_prob * (1 + variation)
+                        # Ensure probability stays within 0-1 range
+                        year_predictions['disasters'][disaster_type] = max(0.0, min(1.0, new_prob))
                 
                 # Final validation: ensure all probabilities are valid numbers
                 for disaster_type, prob in year_predictions['disasters'].items():
